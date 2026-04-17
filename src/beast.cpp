@@ -1658,6 +1658,13 @@ bool Beast::itemEdit(bool getLabel) {
     editValue(cpu.de2, GUI::COL4, GUI::ROW5, 9, 4, getLabel);
     break;
 
+  case SEL_INTERRUPT:
+    if (!getLabel) {
+      bool enable = !(cpu.iff1 && cpu.iff2);
+      cpu.iff1 = cpu.iff2 = enable;
+    }
+    break;
+
   case SEL_LISTING:
     if (listMode == LM_ADDRESS) {
       editValue(listAddress, GUI::COL1, GUI::END_ROW, 10, 4, getLabel);
@@ -1993,9 +2000,10 @@ void Beast::onDebug() {
   gui.print(GUI::COL4, GUI::ROW5, textColor, id-- ? 0 : 3, bright,
             "DE' = 0x%04X", cpu.de2);
 
-  gui.print(GUI::COL5, GUI::ROW1, textColor, "%s",
-            (cpu.iff1 == cpu.iff2) ? (cpu.iff1 ? "EI" : "DI")
-                                   : (cpu.iff1 ? "??" : "NMI"));
+  const char *interruptStatus = (cpu.iff1 == cpu.iff2) ? (cpu.iff1 ? "EI" : "DI")
+                                                       : (cpu.iff1 ? "??" : "NMI");
+  gui.print(GUI::COL5, GUI::ROW1, textColor, id-- ? 0 : (int)strlen(interruptStatus),
+            bright, "%s", interruptStatus);
   gui.print(GUI::COL5, GUI::ROW2, textColor, "IM%01X", cpu.im);
   gui.print(GUI::COL5, GUI::ROW3, textColor, "I   = 0x%02X", cpu.i);
   gui.print(GUI::COL5, GUI::ROW4, textColor, "R   = 0x%02X", cpu.r);

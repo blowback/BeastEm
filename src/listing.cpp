@@ -61,9 +61,9 @@ void Listing::removeFile(unsigned int fileNum) {
   // Renumber remaining source files
   for (auto &source : sources) {
     if (source.fileNum > fileNum) {
-      unsigned int newFileNum = source.fileNum -1;
+      unsigned int newFileNum = source.fileNum - 1;
       source.fileNum = newFileNum;
-      for (auto& symbol:source.symbols) {
+      for (auto &symbol : source.symbols) {
         symbol.fileNum = newFileNum;
       }
     }
@@ -205,7 +205,7 @@ void Listing::loadFile(Source &source) {
   source.lines.clear();
   source.symbols.clear();
 
-  //std::cout << "Clearing old lines " << source.fileNum << std::endl;
+  // std::cout << "Clearing old lines " << source.fileNum << std::endl;
   for (auto it = lineMap.begin(); it != lineMap.end();) {
     // TODO: Peformance fix here
     if (it->second.fileNum == source.fileNum) {
@@ -214,12 +214,13 @@ void Listing::loadFile(Source &source) {
       ++it;
     }
   }
-  //std::cout << "Lines cleared" << std::endl;
+  // std::cout << "Lines cleared" << std::endl;
 
   uint32_t address = 0;
   bool foundAddress = false;
   unsigned int lineNum = 0;
-  unsigned int addressLine = 0; // Line number where current address was first seen
+  unsigned int addressLine =
+      0; // Line number where current address was first seen
 
   std::string text;
 
@@ -246,7 +247,7 @@ void Listing::loadFile(Source &source) {
 
     ltrim(text);
 
-    if (!isLabelMap ) {
+    if (!isLabelMap) {
       // Try to match the address pattern in this line
       std::regex matcher = std::regex(addressRegex, std::regex::icase);
       std::smatch match;
@@ -265,7 +266,7 @@ void Listing::loadFile(Source &source) {
 
         foundAddress = true;
         address = nextAddress;
-        addressLine = lineNum;  // 0-based index (lineNum before push_back)
+        addressLine = lineNum; // 0-based index (lineNum before push_back)
 
         line.address = address;
         line.head = text.substr(
@@ -277,16 +278,18 @@ void Listing::loadFile(Source &source) {
         unsigned int bytePos = match.position(2) + match.length(2);
 
         while (byteCount < 4 && ((bytePos + 2) < text.length()) &&
-              (text[bytePos] == ' ') && isxdigit(tolower(text[bytePos + 1])) &&
-              isxdigit(tolower(text[bytePos + 2]))) {
+               (text[bytePos] == ' ') && isxdigit(tolower(text[bytePos + 1])) &&
+               isxdigit(tolower(text[bytePos + 2]))) {
           line.bytes[byteCount++] =
               (fromHex(text[bytePos + 1]) << 4) | fromHex(text[bytePos + 2]);
           bytePos += 3;
         }
 
         if (bytePos + 2 < text.length()) {
-          if (text[bytePos] == '.' && text[bytePos + 1] == '.' && text[bytePos + 2] == '.') {
-            // DEFS can result in a truncated byte sequence indicated by a '...' string - skip if so.
+          if (text[bytePos] == '.' && text[bytePos + 1] == '.' &&
+              text[bytePos + 2] == '.') {
+            // DEFS can result in a truncated byte sequence indicated by a '...'
+            // string - skip if so.
             bytePos += 3;
           }
         }
@@ -308,32 +311,30 @@ void Listing::loadFile(Source &source) {
           }
         }
       } else {
-        if( text.rfind("tasm:", 0) == 0 ) {
+        if (text.rfind("tasm:", 0) == 0) {
           // We ignore tasm output
-        }
-        else if( text.rfind("# ", 0) == 0) {
+        } else if (text.rfind("# ", 0) == 0) {
           // SJAsmPlus telling us things.
-        }
-        else if( text.rfind("Value", 0) == 0) {
+        } else if (text.rfind("Value", 0) == 0) {
           // SJAsmPlus symbol map follows
-          source.symbols.clear(); // Forget the labels we've scraped and just use the symbol map
+          source.symbols.clear(); // Forget the labels we've scraped and just
+                                  // use the symbol map
           isLabelMap = true;
-        }
-        else {
-          std::cout << "No match on line " << lineNum << ": " << text << std::endl;
+        } else {
+          std::cout << "No match on line " << lineNum << ": " << text
+                    << std::endl;
         }
       }
 
       source.lines.push_back(line);
-      lineNum++;  // Increment after push_back so addressLine is 0-based index
-    }
-    else {
+      lineNum++; // Increment after push_back so addressLine is 0-based index
+    } else {
       // SJAsmPlus label format:
       // 0x0010 X module.labelName
       //
-      if (text.length() > 9 && text.rfind("0x",0) == 0) {
+      if (text.length() > 9 && text.rfind("0x", 0) == 0) {
         if (text[7] != 'X') { // Skip unused labels
-          uint32_t value = std::stoi(text.substr(2,4), nullptr, 16);
+          uint32_t value = std::stoi(text.substr(2, 4), nullptr, 16);
           std::string label = text.substr(9);
           Symbol symbol = {label, value, source.page};
           source.symbols.push_back(symbol);
@@ -351,10 +352,12 @@ void Listing::loadFile(Source &source) {
 
   updateSymbolMap();
   std::cout << "Parsed listing, file " << source.filename << " for page "
-            << source.page << " has " << lineNum << " lines, " << source.symbols.size() << " label(s)." << std::endl;
+            << source.page << " has " << lineNum << " lines, "
+            << source.symbols.size() << " label(s)." << std::endl;
 }
 
-void Listing::addSymbol( std::string &text, Listing::Line &line, Listing::Source &source) {
+void Listing::addSymbol(std::string &text, Listing::Line &line,
+                        Listing::Source &source) {
   // Now see if we have a label..
   size_t index = symbolColumn;
 
@@ -369,18 +372,23 @@ void Listing::addSymbol( std::string &text, Listing::Line &line, Listing::Source
       }
 
       bool isEquate = false;
-      while (++index < text.length() && (text[index] == ' ' || text[index] == '\t') ) {}
+      while (++index < text.length() &&
+             (text[index] == ' ' || text[index] == '\t')) {
+      }
 
-      if( index < text.length() && text[index] == '.') index++;
+      if (index < text.length() && text[index] == '.')
+        index++;
 
-      if (text.rfind("equ", index) == index || text.rfind("EQU", index) == index) {
+      if (text.rfind("equ", index) == index ||
+          text.rfind("EQU", index) == index) {
         isEquate = true;
       }
 
       if (!isEquate) {
         Symbol symbol = {label, line.address, source.page, source.fileNum};
         source.symbols.push_back(symbol);
-        // std::cout << "Label '" << label << " = " << line.address << std::endl;
+        // std::cout << "Label '" << label << " = " << line.address <<
+        // std::endl;
       }
     }
   }
@@ -388,8 +396,8 @@ void Listing::addSymbol( std::string &text, Listing::Line &line, Listing::Source
 
 void Listing::updateSymbolMap() {
   symbolMap.clear();
-  for(auto &source: sources) {
-    for (auto &symbol: source.symbols) {
+  for (auto &source : sources) {
+    for (auto &symbol : source.symbols) {
       symbolMap.insert(symbol);
     }
   }
@@ -468,34 +476,36 @@ void Listing::toggleWatch(Source &file) { file.watch = !file.watch; }
 void Listing::lookup(std::string match) {
   symbolLookup.clear();
 
-  if (match.length()<2) {
+  if (match.length() < 2) {
     return;
   }
 
   bool filterFile = false;
-  unsigned int  fileNum = 0;
+  unsigned int fileNum = 0;
 
   if (match[1] == ':' && std::isdigit(match[0])) {
-    fileNum = match[0]-'0';
+    fileNum = match[0] - '0';
     if (fileNum-- > 0) {
       filterFile = true;
       match = match.substr(2);
 
-      if (match.length()<2) {
+      if (match.length() < 2) {
         return;
       }
     }
   }
 
-  for (auto & symbol: symbolMap) {
+  for (auto &symbol : symbolMap) {
     bool found = true;
     size_t i = match.length();
 
-    if (filterFile && symbol.fileNum != fileNum) continue;
-    if (i>symbol.label.length()) continue;
+    if (filterFile && symbol.fileNum != fileNum)
+      continue;
+    if (i > symbol.label.length())
+      continue;
 
-    while(i-->0) {
-      if(tolower(match[i]) != tolower(symbol.label[i])) {
+    while (i-- > 0) {
+      if (tolower(match[i]) != tolower(symbol.label[i])) {
         found = false;
         break;
       }
@@ -503,53 +513,58 @@ void Listing::lookup(std::string match) {
     if (found) {
       symbolLookup.push_back(symbol);
     }
-    
-    if (symbolLookup.size()>MAX_LOOKUP) break;
+
+    if (symbolLookup.size() > MAX_LOOKUP)
+      break;
   }
 
- 
-  for(auto & symbol: symbolMap) {
-    if (filterFile && symbol.fileNum != fileNum) continue;
-    if (symbolLookup.size()>MAX_LOOKUP) break;
+  for (auto &symbol : symbolMap) {
+    if (filterFile && symbol.fileNum != fileNum)
+      continue;
+    if (symbolLookup.size() > MAX_LOOKUP)
+      break;
 
     size_t k = 0;
     for (size_t i = 0; i < symbol.label.size(); ++i)
       if (tolower(match[k]) == tolower(symbol.label[i])) {
         k++;
         if (k == match.size()) {
-            symbolLookup.push_back(symbol);
-            break;
+          symbolLookup.push_back(symbol);
+          break;
         }
       }
   }
-
 }
 
-size_t Listing::matches() {
-  return symbolLookup.size();
-}
+size_t Listing::matches() { return symbolLookup.size(); }
 
 std::string Listing::getLabel(size_t index) {
-  if (index>symbolLookup.size()) return "";
+  if (index > symbolLookup.size())
+    return "";
   return symbolLookup[index].label;
 }
 
 int Listing::getValue(size_t index) {
-  if (index>symbolLookup.size()) return 0;
+  if (index > symbolLookup.size())
+    return 0;
 
   return symbolLookup[index].value;
 }
 
 std::string Listing::getDescription1(size_t index) {
-    if (index>symbolLookup.size()) return 0;
+  if (index > symbolLookup.size())
+    return "";
 
-    Symbol& symbol = symbolLookup[index];
-    return GUI::string_format("0x%04X  Physical: 0x%05X", symbol.value, (symbol.value & 0x3FFF) | (symbol.page << 14));
+  Symbol &symbol = symbolLookup[index];
+  return GUI::string_format("0x%04X  Physical: 0x%05X", symbol.value,
+                            (symbol.value & 0x3FFF) | (symbol.page << 14));
 }
 
 std::string Listing::getDescription2(size_t index) {
-    if (index>symbolLookup.size()) return 0;
+  if (index > symbolLookup.size())
+    return "";
 
-    Symbol& symbol = symbolLookup[index];
-    return GUI::string_format("File %d: %-14s", symbol.fileNum+1, sources[symbol.fileNum].filename.c_str());
+  Symbol &symbol = symbolLookup[index];
+  return GUI::string_format("File %d: %-14s", symbol.fileNum + 1,
+                            sources[symbol.fileNum].filename.c_str());
 }
