@@ -1896,16 +1896,16 @@ void Beast::onFile() {
   SDL_Color bright = {0xD0, 0xFF, 0xD0};
   SDL_Color menuColor = {0x30, 0x30, 0xA0};
 
-  gui.print(GUI::COL1, 34, menuColor, "S: Add Source");
+  gui.printKeyHint(GUI::COL1, 34, menuColor, "S: Add Source");
 
-  gui.print(GUI::COL2, 34, menuColor, "L: Load Address");
-  gui.print(GUI::COL3, 34, menuColor, "P: Load Page");
-  gui.print(GUI::COL4, 34, menuColor, "C: Load CPU");
+  gui.printKeyHint(GUI::COL2, 34, menuColor, "L: Load Address");
+  gui.printKeyHint(GUI::COL3, 34, menuColor, "P: Load Page");
+  gui.printKeyHint(GUI::COL4, 34, menuColor, "C: Load CPU");
 
   if (videoBeast) {
-    gui.print(GUI::COL5, 34, menuColor, "V: Load Video");
+    gui.printKeyHint(GUI::COL5, 34, menuColor, "V: Load Video");
   } else {
-    gui.print(GUI::COL5, 34, menuColor, "V: Start VideoBeast");
+    gui.printKeyHint(GUI::COL5, 34, menuColor, "V: Start VideoBeast");
   }
   int row = GUI::ROW2;
   int index = 1;
@@ -1962,15 +1962,15 @@ void Beast::onFile() {
     }
   }
 
-  gui.print(GUI::COL1, GUI::END_ROW, menuColor, "W: Write");
-  gui.print(GUI::COL2, GUI::END_ROW, menuColor, "R: Run");
+  gui.printKeyHint(GUI::COL1, GUI::END_ROW, menuColor, "W: Write");
+  gui.printKeyHint(GUI::COL2, GUI::END_ROW, menuColor, "R: Run");
 
   if (audioSampleRatePs > 0) {
-    gui.print(GUI::COL3 - 40, GUI::END_ROW, menuColor, "A: Append audio %s",
+    gui.printKeyHint(GUI::COL3 - 40, GUI::END_ROW, menuColor, "A: Append audio %s",
               audioFile ? "ON" : "OFF");
     gui.print(GUI::COL4, GUI::END_ROW, textColor, "File \"%s\"", audioFilename);
   }
-  gui.print(GUI::COL5, GUI::END_ROW, menuColor, "ESC: Exit");
+  gui.printKeyHint(GUI::COL5, GUI::END_ROW, menuColor, "ESC: Exit");
 }
 
 void Beast::checkWatchedFiles() {
@@ -2012,11 +2012,11 @@ void Beast::onDebug() {
   SDL_Color menuColor = {0x30, 0x30, 0xA0};
   SDL_Color disabledColor = {0x90, 0x90, 0xB0};
 
-  gui.print(GUI::COL1, 34, menuColor, "R: Run");
-  gui.print(GUI::COL2, 34, menuColor, "S: Step");
-  gui.print(GUI::COL3, 34, menuColor, "O: Step Over");
-  gui.print(GUI::COL4, 34, menuColor, "U: Step out");
-  gui.print(GUI::COL5, 34, menuColor, "T: Until Taken");
+  gui.printKeyHint(GUI::COL1, 34, menuColor, "R: Run");
+  gui.printKeyHint(GUI::COL2, 34, menuColor, "S: Step");
+  gui.printKeyHint(GUI::COL3, 34, menuColor, "O: Step Over");
+  gui.printKeyHint(GUI::COL4, 34, menuColor, "U: Step out");
+  gui.printKeyHint(GUI::COL5, 34, menuColor, "T: Until Taken");
 
   int id = selection;
 
@@ -2114,7 +2114,7 @@ void Beast::onDebug() {
 
   gui.print(620, GUI::ROW19, textColor, "TTY :%d", uart_port(&uart));
   if (uart_connected(&uart)) {
-    gui.print(620, GUI::ROW20, menuColor, "D: Connected Drop");
+    gui.printKeyHint(620, GUI::ROW20, menuColor, "D: Connected Drop");
   } else {
     gui.print(620, GUI::ROW20, textColor, "Disconnected");
   }
@@ -2154,10 +2154,10 @@ void Beast::onDebug() {
   int x = GUI::COL1;
   for (int i = 0; i < itemCount; i++) {
     if (items[i].highlight) {
-      gui.print(x, GUI::END_ROW, items[i].color, items[i].highlight, bright,
-                "%s", items[i].label);
+      gui.printKeyHint(x, GUI::END_ROW, items[i].color, items[i].highlight,
+                       bright, "%s", items[i].label);
     } else {
-      gui.print(x, GUI::END_ROW, items[i].color, "%s", items[i].label);
+      gui.printKeyHint(x, GUI::END_ROW, items[i].color, "%s", items[i].label);
     }
     x += gui.getWidthFor(strlen(items[i].label)) + gap;
   }

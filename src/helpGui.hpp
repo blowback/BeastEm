@@ -84,8 +84,8 @@ class HelpGui {
             gui->print(GUI::COL1, row, textColor, "click on the display window and use the '[' and ']' keys");
             row += GUI::ROW_HEIGHT;
 
-            gui->print(GUI::COL1, GUI::END_ROW, menuColor, "R: Run");
-            gui->print(GUI::COL5, GUI::END_ROW, menuColor, "ESC: Exit");
+            gui->printKeyHint(GUI::COL1, GUI::END_ROW, menuColor, "R: Run");
+            gui->printKeyHint(GUI::COL5, GUI::END_ROW, menuColor, "ESC: Exit");
         }
 
         static void drawCentered(int y, const char* text, GUI *gui, const SDL_Color &menuColor, SDL_Renderer *sdlRenderer, int screenWidth, float zoom)

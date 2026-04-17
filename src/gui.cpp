@@ -540,3 +540,24 @@ int GUI::printb(int x, int y, SDL_Color color, int highlight, SDL_Color backgrou
 int GUI::getWidthFor(int characters) {
     return charWidth * characters / zoom;
 }
+
+int GUI::printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
+    int avg = (color.r + color.g + color.b) / 3;
+    SDL_Color hintColor = {(Uint8)avg, (Uint8)avg, (Uint8)avg, color.a};
+
+    char *colon = strchr(buffer, ':');
+    if (!colon || colon == buffer) {
+        return printb(x, y, hintColor, highlight, background, buffer);
+    }
+    int keyLen = (int)(colon - buffer);
+    int keyWidth = getWidthFor(keyLen);
+
+    SDL_Color keyTextColor = {0xE0, 0xE0, 0xE0, 0xFF};
+    char savedChar = buffer[keyLen];
+    buffer[keyLen] = '\0';
+    printb(x, y, keyTextColor, keyLen, hintColor, buffer);
+    buffer[keyLen] = savedChar;
+
+    int restWidth = printb(x + keyWidth, y, hintColor, highlight, background, buffer + keyLen);
+    return keyWidth + restWidth;
+}

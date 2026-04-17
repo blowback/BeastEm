@@ -3,6 +3,7 @@
 #include "SDL2_gfxPrimitives.h"
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
 #include <iostream>
 
 PageMap::PageMap() {}
@@ -501,7 +502,29 @@ void PageMap::draw(const uint8_t memoryPage[4], bool pagingEnabled, bool videoBe
         const char* legend = "ESC: Close";
         int tw, th;
         TTF_SizeUTF8(monoFont, legend, &tw, &th);
-        print(monoFont, (WIDTH - tw) / 2, HEIGHT - 24, menuColor, "%s", legend);
+        int baseX = (WIDTH - tw) / 2;
+        int baseY = HEIGHT - 24;
+        const char* colon = strchr(legend, ':');
+        if (colon && colon != legend) {
+            int keyLen = (int)(colon - legend);
+            char keyBuf[32];
+            snprintf(keyBuf, sizeof(keyBuf), "%.*s", keyLen, legend);
+            int kw, kh;
+            TTF_SizeUTF8(monoFont, keyBuf, &kw, &kh);
+
+            int avg = (menuColor.r + menuColor.g + menuColor.b) / 3;
+            SDL_Color hintColor = {(Uint8)avg, (Uint8)avg, (Uint8)avg, menuColor.a};
+
+            SDL_Rect r = {baseX, baseY + 1, kw, kh - 2};
+            SDL_SetRenderDrawColor(renderer, hintColor.r, hintColor.g, hintColor.b, 0xFF);
+            SDL_RenderFillRect(renderer, &r);
+
+            SDL_Color keyTextColor = {0xE0, 0xE0, 0xE0, 0xFF};
+            print(monoFont, baseX, baseY, keyTextColor, "%s", keyBuf);
+            print(monoFont, baseX + kw, baseY, hintColor, "%s", legend + keyLen);
+        } else {
+            print(monoFont, baseX, baseY, menuColor, "%s", legend);
+        }
     }
 
     SDL_RenderPresent(renderer);

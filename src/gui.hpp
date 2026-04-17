@@ -148,6 +148,35 @@ class GUI {
             return 0;
         }
 
+        /* Prints a "KEY: Label" hint with the key portion rendered in reverse video */
+        template<typename... Args> int printKeyHint(int x, int y, SDL_Color color, const char *fmt, Args... args) {
+            char buffer[200];
+            int c;
+            if constexpr (sizeof...(Args) == 0) {
+                c = snprintf(buffer, sizeof(buffer), "%s", fmt);
+            } else {
+                c = snprintf(buffer, sizeof(buffer), fmt, args...);
+            }
+            if( c > 0 && c<(int)sizeof(buffer)) {
+                return printKeyHintB(x, y, color, 0, {0}, buffer);
+            }
+            return 0;
+        }
+
+        template<typename... Args> int printKeyHint(int x, int y, SDL_Color color, int highlight, SDL_Color background, const char *fmt, Args... args) {
+            char buffer[200];
+            int c;
+            if constexpr (sizeof...(Args) == 0) {
+                c = snprintf(buffer, sizeof(buffer), "%s", fmt);
+            } else {
+                c = snprintf(buffer, sizeof(buffer), fmt, args...);
+            }
+            if( c > 0 && c<(int)sizeof(buffer)) {
+                return printKeyHintB(x, y, color, highlight, background, buffer);
+            }
+            return 0;
+        }
+
         template<typename... Args> void startPrompt(int id, const char *fmt, Args... args) {
             promptId = id;
             int c;
@@ -230,5 +259,8 @@ class GUI {
 
         /* Print a buffer at the given location, returning the gui width of the displayed string */
         int       printb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
+
+        /* Print a key-hint buffer with reverse-video on the key (chars before the first ':') */
+        int       printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
 
 };
