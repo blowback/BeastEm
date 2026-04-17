@@ -1,0 +1,49 @@
+# Tokyo Night — https://github.com/folke/tokyonight.nvim
+# Shipped theme. Select with `active_theme = tokyo-night` in beastem.conf.
+
+color.text                = #C0CAF5
+color.menu                = #7AA2F7
+color.bright              = #9ECE6A
+color.dim                 = #737AA2
+color.very_dim            = #545C7E
+color.disabled            = #565F89
+color.disassembly         = #BB9AF7
+color.current_pc          = #F7768E
+color.yellow              = #E0AF68
+color.key_ink             = #1A1B26
+
+color.key_cap             = #C0CAF5
+color.keyboard_bg         = #16161E
+color.key_pressed         = #7AA2F7
+
+color.breakpoint_enabled  = #F7768E
+color.breakpoint_disabled = #F7768E64
+color.trace_enabled       = #BB9AF7
+color.trace_disabled      = #BB9AF764
+color.watchpoint          = #73DACA
+color.indicator_text      = #1A1B26
+
+color.dialog_bg           = #16161EE8
+color.pagemap_bg          = #1A1B26
+color.screen_bg           = #16161E
+
+color.edit_bg             = #292E42
+color.edit_ink            = #C0CAF5
+color.edit_highlight      = #F7768E
+color.prompt_bg           = #16161E
+
+color.digit_bg            = #16161E
+color.digit_on            = #7DCFFF
+
+color.page_addr           = #A9B1D6
+color.page_dark_text      = #16161E
+color.page_light_text     = #C0CAF5
+color.page_border         = #3B4261
+color.page_cpm            = #7AA2F7
+color.page_ramdisk        = #73DACA
+color.page_free           = #A9B1D6
+color.page_restore        = #F7768E
+color.page_romdisk        = #BB9AF7
+color.page_boot           = #E0AF68
+color.page_vconsole       = #7DCFFF
+color.page_videobeast     = #FF9E64

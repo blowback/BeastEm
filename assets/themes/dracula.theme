@@ -1,0 +1,49 @@
+# Dracula — https://draculatheme.com/
+# Shipped theme. Select with `active_theme = dracula` in beastem.conf.
+
+color.text                = #F8F8F2
+color.menu                = #8BE9FD
+color.bright              = #50FA7B
+color.dim                 = #6272A4
+color.very_dim            = #44475A
+color.disabled            = #6272A4
+color.disassembly         = #BD93F9
+color.current_pc          = #FF5555
+color.yellow              = #F1FA8C
+color.key_ink             = #282A36
+
+color.key_cap             = #F8F8F2
+color.keyboard_bg         = #44475A
+color.key_pressed         = #BD93F9
+
+color.breakpoint_enabled  = #FF5555
+color.breakpoint_disabled = #FF555564
+color.trace_enabled       = #BD93F9
+color.trace_disabled      = #BD93F964
+color.watchpoint          = #8BE9FD
+color.indicator_text      = #282A36
+
+color.dialog_bg           = #282A36E8
+color.pagemap_bg          = #282A36
+color.screen_bg           = #21222C
+
+color.edit_bg             = #44475A
+color.edit_ink            = #F8F8F2
+color.edit_highlight      = #FF79C6
+color.prompt_bg           = #282A36
+
+color.digit_bg            = #21222C
+color.digit_on            = #8BE9FD
+
+color.page_addr           = #6272A4
+color.page_dark_text      = #21222C
+color.page_light_text     = #F8F8F2
+color.page_border         = #6272A4
+color.page_cpm            = #BD93F9
+color.page_ramdisk        = #8BE9FD
+color.page_free           = #44475A
+color.page_restore        = #FF5555
+color.page_romdisk        = #FF79C6
+color.page_boot           = #F1FA8C
+color.page_vconsole       = #6272A4
+color.page_videobeast     = #FFB86C

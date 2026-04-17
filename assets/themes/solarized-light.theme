@@ -1,0 +1,49 @@
+# Solarized Light — https://ethanschoonover.com/solarized/
+# Shipped theme. Select with `active_theme = solarized-light` in beastem.conf.
+
+color.text                = #657B83
+color.menu                = #268BD2
+color.bright              = #859900
+color.dim                 = #93A1A1
+color.very_dim            = #EEE8D5
+color.disabled            = #93A1A1
+color.disassembly         = #6C71C4
+color.current_pc          = #DC322F
+color.yellow              = #B58900
+color.key_ink             = #FDF6E3
+
+color.key_cap             = #657B83
+color.keyboard_bg         = #EEE8D5
+color.key_pressed         = #268BD2
+
+color.breakpoint_enabled  = #DC322F
+color.breakpoint_disabled = #DC322F64
+color.trace_enabled       = #6C71C4
+color.trace_disabled      = #6C71C464
+color.watchpoint          = #2AA198
+color.indicator_text      = #FDF6E3
+
+color.dialog_bg           = #FDF6E3E8
+color.pagemap_bg          = #FDF6E3
+color.screen_bg           = #EEE8D5
+
+color.edit_bg             = #FFFFFF
+color.edit_ink            = #586E75
+color.edit_highlight      = #DC322F
+color.prompt_bg           = #EEE8D5
+
+color.digit_bg            = #002B36
+color.digit_on            = #268BD2
+
+color.page_addr           = #586E75
+color.page_dark_text      = #002B36
+color.page_light_text     = #FDF6E3
+color.page_border         = #93A1A1
+color.page_cpm            = #268BD2
+color.page_ramdisk        = #2AA198
+color.page_free           = #EEE8D5
+color.page_restore        = #DC322F
+color.page_romdisk        = #6C71C4
+color.page_boot           = #EEE8D5
+color.page_vconsole       = #2AA198
+color.page_videobeast     = #CB4B16
