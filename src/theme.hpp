@@ -9,6 +9,7 @@ struct Theme {
     // Fonts (filenames relative to assets/fonts/, or absolute paths).
     // Semantic slots — each UI region can use a different font.
     std::string font_ui;                // the whole debug GUI (monospace)
+    std::string font_ui_labels;         // register / column / port labels in the debug view
     std::string font_ui_indicators;     // breakpoint / watchpoint number badges
     std::string font_key_caps;          // main label on virtual keyboard keys
     std::string font_key_narrow;        // narrow keys (Shift, Ctrl, …)

@@ -182,6 +182,7 @@ void Theme::load(Config &config) {
     }
 
     t.font_ui               = src.getStr("font.ui",               "RobotoMono-VariableFont_wght.ttf", dirty);
+    t.font_ui_labels        = src.getStr("font.ui.labels",        "Roboto-Medium.ttf", dirty);
     t.font_ui_indicators    = src.getStr("font.ui.indicators",    "Roboto-Medium.ttf", dirty);
     t.font_key_caps         = src.getStr("font.key.caps",         "Roboto-Medium.ttf", dirty);
     t.font_key_narrow       = src.getStr("font.key.narrow",       "Roboto-Medium.ttf", dirty);

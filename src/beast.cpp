@@ -2034,16 +2034,18 @@ void Beast::onDebug() {
 
   int id = selection;
 
-  gui.print(GUI::COL1, GUI::ROW1, textColor, id-- ? 0 : 2, bright,
-            "PC = 0x%04X", (uint16_t)(cpu.pc - 1));
-  gui.print(GUI::COL1, GUI::ROW2, textColor, id-- ? 0 : 2, bright,
-            " A = 0x%02X", cpu.a);
-  gui.print(GUI::COL1, GUI::ROW3, textColor, id-- ? 0 : 2, bright,
-            "HL = 0x%04X", cpu.hl);
-  gui.print(GUI::COL1, GUI::ROW4, textColor, id-- ? 0 : 2, bright,
-            "BC = 0x%04X", cpu.bc);
-  gui.print(GUI::COL1, GUI::ROW5, textColor, id-- ? 0 : 2, bright,
-            "DE = 0x%04X", cpu.de);
+  int valueOffset2 = gui.getWidthFor(2);
+  gui.printLabel(GUI::COL1, GUI::ROW1, textColor, id-- ? 0 : 2, bright, "PC");
+  gui.print(GUI::COL1 + valueOffset2, GUI::ROW1, textColor,
+            " = 0x%04X", (uint16_t)(cpu.pc - 1));
+  gui.printLabel(GUI::COL1, GUI::ROW2, textColor, id-- ? 0 : 2, bright, " A");
+  gui.print(GUI::COL1 + valueOffset2, GUI::ROW2, textColor, " = 0x%02X", cpu.a);
+  gui.printLabel(GUI::COL1, GUI::ROW3, textColor, id-- ? 0 : 2, bright, "HL");
+  gui.print(GUI::COL1 + valueOffset2, GUI::ROW3, textColor, " = 0x%04X", cpu.hl);
+  gui.printLabel(GUI::COL1, GUI::ROW4, textColor, id-- ? 0 : 2, bright, "BC");
+  gui.print(GUI::COL1 + valueOffset2, GUI::ROW4, textColor, " = 0x%04X", cpu.bc);
+  gui.printLabel(GUI::COL1, GUI::ROW5, textColor, id-- ? 0 : 2, bright, "DE");
+  gui.print(GUI::COL1 + valueOffset2, GUI::ROW5, textColor, " = 0x%04X", cpu.de);
 
   char carry = (cpu.f & Z80_CF) ? 'C' : 'c';
   char neg = (cpu.f & Z80_NF) ? 'N' : 'n';
@@ -2055,49 +2057,56 @@ void Beast::onDebug() {
   char hflag = (cpu.f & Z80_HF) ? '1' : '0';
   char yflag = (cpu.f & Z80_YF) ? '1' : '0';
 
-  gui.print(GUI::COL2, GUI::ROW1, textColor, id-- ? 0 : 5, bright,
-            "Flags %c%c%c%c%c%c%c%c", sign, zero, yflag, hflag, xflag, overflow,
+  gui.printLabel(GUI::COL2, GUI::ROW1, textColor, id-- ? 0 : 5, bright, "Flags");
+  gui.print(GUI::COL2 + gui.getWidthFor(5), GUI::ROW1, textColor,
+            " %c%c%c%c%c%c%c%c", sign, zero, yflag, hflag, xflag, overflow,
             neg, carry);
-  gui.print(GUI::COL2, GUI::ROW3, textColor, id-- ? 0 : 2, bright,
-            "SP = 0x%04X", cpu.sp);
-  gui.print(GUI::COL2, GUI::ROW4, textColor, id-- ? 0 : 2, bright,
-            "IX = 0x%04X", cpu.ix);
-  gui.print(GUI::COL2, GUI::ROW5, textColor, id-- ? 0 : 2, bright,
-            "IY = 0x%04X", cpu.iy);
+  gui.printLabel(GUI::COL2, GUI::ROW3, textColor, id-- ? 0 : 2, bright, "SP");
+  gui.print(GUI::COL2 + valueOffset2, GUI::ROW3, textColor, " = 0x%04X", cpu.sp);
+  gui.printLabel(GUI::COL2, GUI::ROW4, textColor, id-- ? 0 : 2, bright, "IX");
+  gui.print(GUI::COL2 + valueOffset2, GUI::ROW4, textColor, " = 0x%04X", cpu.ix);
+  gui.printLabel(GUI::COL2, GUI::ROW5, textColor, id-- ? 0 : 2, bright, "IY");
+  gui.print(GUI::COL2 + valueOffset2, GUI::ROW5, textColor, " = 0x%04X", cpu.iy);
 
+  int pagingLabelOffset = gui.getWidthFor(6);
   if (pagingEnabled) {
-    gui.print(GUI::COL3, GUI::ROW1, textColor, id-- ? 0 : -2, bright,
-              "Paging ON");
+    gui.printLabel(GUI::COL3, GUI::ROW1, textColor, "Paging");
+    gui.print(GUI::COL3 + pagingLabelOffset, GUI::ROW1, textColor,
+              id-- ? 0 : -2, bright, " ON");
   } else {
-    gui.print(GUI::COL3, GUI::ROW1, textColor, id-- ? 0 : -3, bright,
-              "Paging OFF");
+    gui.printLabel(GUI::COL3, GUI::ROW1, textColor, "Paging");
+    gui.print(GUI::COL3 + pagingLabelOffset, GUI::ROW1, textColor,
+              id-- ? 0 : -3, bright, " OFF");
   }
 
-  gui.print(GUI::COL3, GUI::ROW2, textColor, id-- ? 0 : 6, bright,
-            "Page 0 0x%02X", memoryPage[0]);
-  gui.print(GUI::COL3, GUI::ROW3, textColor, id-- ? 0 : 6, bright,
-            "Page 1 0x%02X", memoryPage[1]);
-  gui.print(GUI::COL3, GUI::ROW4, textColor, id-- ? 0 : 6, bright,
-            "Page 2 0x%02X", memoryPage[2]);
-  gui.print(GUI::COL3, GUI::ROW5, textColor, id-- ? 0 : 6, bright,
-            "Page 3 0x%02X", memoryPage[3]);
+  gui.printLabel(GUI::COL3, GUI::ROW2, textColor, id-- ? 0 : 6, bright, "Page 0");
+  gui.print(GUI::COL3 + pagingLabelOffset, GUI::ROW2, textColor, " 0x%02X", memoryPage[0]);
+  gui.printLabel(GUI::COL3, GUI::ROW3, textColor, id-- ? 0 : 6, bright, "Page 1");
+  gui.print(GUI::COL3 + pagingLabelOffset, GUI::ROW3, textColor, " 0x%02X", memoryPage[1]);
+  gui.printLabel(GUI::COL3, GUI::ROW4, textColor, id-- ? 0 : 6, bright, "Page 2");
+  gui.print(GUI::COL3 + pagingLabelOffset, GUI::ROW4, textColor, " 0x%02X", memoryPage[2]);
+  gui.printLabel(GUI::COL3, GUI::ROW5, textColor, id-- ? 0 : 6, bright, "Page 3");
+  gui.print(GUI::COL3 + pagingLabelOffset, GUI::ROW5, textColor, " 0x%02X", memoryPage[3]);
 
-  gui.print(GUI::COL4, GUI::ROW2, textColor, id-- ? 0 : 3, bright,
-            " A' = 0x%02X", cpu.af2 & 0x0FF);
-  gui.print(GUI::COL4, GUI::ROW3, textColor, id-- ? 0 : 3, bright,
-            "HL' = 0x%04X", cpu.hl2);
-  gui.print(GUI::COL4, GUI::ROW4, textColor, id-- ? 0 : 3, bright,
-            "BC' = 0x%04X", cpu.bc2);
-  gui.print(GUI::COL4, GUI::ROW5, textColor, id-- ? 0 : 3, bright,
-            "DE' = 0x%04X", cpu.de2);
+  int valueOffset3 = gui.getWidthFor(3);
+  gui.printLabel(GUI::COL4, GUI::ROW2, textColor, id-- ? 0 : 3, bright, " A'");
+  gui.print(GUI::COL4 + valueOffset3, GUI::ROW2, textColor, " = 0x%02X", cpu.af2 & 0x0FF);
+  gui.printLabel(GUI::COL4, GUI::ROW3, textColor, id-- ? 0 : 3, bright, "HL'");
+  gui.print(GUI::COL4 + valueOffset3, GUI::ROW3, textColor, " = 0x%04X", cpu.hl2);
+  gui.printLabel(GUI::COL4, GUI::ROW4, textColor, id-- ? 0 : 3, bright, "BC'");
+  gui.print(GUI::COL4 + valueOffset3, GUI::ROW4, textColor, " = 0x%04X", cpu.bc2);
+  gui.printLabel(GUI::COL4, GUI::ROW5, textColor, id-- ? 0 : 3, bright, "DE'");
+  gui.print(GUI::COL4 + valueOffset3, GUI::ROW5, textColor, " = 0x%04X", cpu.de2);
 
   const char *interruptStatus = (cpu.iff1 == cpu.iff2) ? (cpu.iff1 ? "EI" : "DI")
                                                        : (cpu.iff1 ? "??" : "NMI");
   gui.print(GUI::COL5, GUI::ROW1, textColor, id-- ? 0 : (int)strlen(interruptStatus),
             bright, "%s", interruptStatus);
   gui.print(GUI::COL5, GUI::ROW2, textColor, "IM%01X", cpu.im);
-  gui.print(GUI::COL5, GUI::ROW3, textColor, "I   = 0x%02X", cpu.i);
-  gui.print(GUI::COL5, GUI::ROW4, textColor, "R   = 0x%02X", cpu.r);
+  gui.printLabel(GUI::COL5, GUI::ROW3, textColor, "I");
+  gui.print(GUI::COL5 + gui.getWidthFor(1), GUI::ROW3, textColor, "   = 0x%02X", cpu.i);
+  gui.printLabel(GUI::COL5, GUI::ROW4, textColor, "R");
+  gui.print(GUI::COL5 + gui.getWidthFor(1), GUI::ROW4, textColor, "   = 0x%02X", cpu.r);
 
   id = drawMemoryLayout(0, GUI::ROW7, id, textColor, bright);
   id = drawMemoryLayout(1, GUI::ROW11, id, textColor, bright);
@@ -2106,7 +2115,7 @@ void Beast::onDebug() {
   std::bitset<8> ioSelectA(pio.port[0].io_select);
   std::bitset<8> portDataA(Z80PIO_GET_PA(pins));
 
-  gui.print(GUI::COL1, GUI::ROW19, textColor, "Port A");
+  gui.printLabel(GUI::COL1, GUI::ROW19, textColor, "Port A");
   gui.print(120, GUI::ROW19, textColor,
             (char *)ioSelectA.to_string('O', 'I').c_str());
   gui.print(120, GUI::ROW20, textColor, (char *)portDataA.to_string().c_str());
@@ -2114,19 +2123,20 @@ void Beast::onDebug() {
   std::bitset<8> ioSelectB(pio.port[1].io_select);
   std::bitset<8> portDataB(Z80PIO_GET_PB(pins));
 
-  gui.print(220, GUI::ROW19, textColor, "Port B");
+  gui.printLabel(220, GUI::ROW19, textColor, "Port B");
   gui.print(290, GUI::ROW19, textColor,
             (char *)ioSelectB.to_string('O', 'I').c_str());
   gui.print(290, GUI::ROW20, textColor, (char *)portDataB.to_string().c_str());
 
   if (audioSampleRatePs > 0) {
-    gui.print(430, GUI::ROW19, textColor, id-- ? 0 : 6, bright, "Volume  %02d",
-              volume);
+    gui.printLabel(430, GUI::ROW19, textColor, id-- ? 0 : 6, bright, "Volume");
+    gui.print(430 + gui.getWidthFor(6), GUI::ROW19, textColor, "  %02d", volume);
   } else {
     gui.print(430, GUI::ROW19, textColor, "Audio Disabled");
   }
 
-  gui.print(620, GUI::ROW19, textColor, "TTY :%d", uart_port(&uart));
+  gui.printLabel(620, GUI::ROW19, textColor, "TTY");
+  gui.print(620 + gui.getWidthFor(3), GUI::ROW19, textColor, " :%d", uart_port(&uart));
   if (uart_connected(&uart)) {
     gui.printKeyHint(620, GUI::ROW20, menuColor, "D: Connected Drop");
   } else {
@@ -2179,7 +2189,7 @@ void Beast::onDebug() {
 
 int Beast::drawMemoryLayout(int view, int topRow, int id, SDL_Color textColor,
                             SDL_Color bright) {
-  gui.print(GUI::COL1, topRow, textColor, id-- ? 0 : 5, bright, "%s",
+  gui.printLabel(GUI::COL1, topRow, textColor, id-- ? 0 : 5, bright, "%s",
             nameFor(memView[view]).c_str());
 
   uint32_t address = memView[view] != MV_VIDEO

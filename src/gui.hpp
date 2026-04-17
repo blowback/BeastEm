@@ -177,6 +177,35 @@ class GUI {
             return 0;
         }
 
+        /* Renders label text with the UI-labels font (typically proportional) */
+        template<typename... Args> int printLabel(int x, int y, SDL_Color color, const char *fmt, Args... args) {
+            char buffer[200];
+            int c;
+            if constexpr (sizeof...(Args) == 0) {
+                c = snprintf(buffer, sizeof(buffer), "%s", fmt);
+            } else {
+                c = snprintf(buffer, sizeof(buffer), fmt, args...);
+            }
+            if( c > 0 && c<(int)sizeof(buffer)) {
+                return printlb(x, y, color, 0, {0}, buffer);
+            }
+            return 0;
+        }
+
+        template<typename... Args> int printLabel(int x, int y, SDL_Color color, int highlight, SDL_Color background, const char *fmt, Args... args) {
+            char buffer[200];
+            int c;
+            if constexpr (sizeof...(Args) == 0) {
+                c = snprintf(buffer, sizeof(buffer), "%s", fmt);
+            } else {
+                c = snprintf(buffer, sizeof(buffer), fmt, args...);
+            }
+            if( c > 0 && c<(int)sizeof(buffer)) {
+                return printlb(x, y, color, highlight, background, buffer);
+            }
+            return 0;
+        }
+
         template<typename... Args> void startPrompt(int id, const char *fmt, Args... args) {
             promptId = id;
             int c;
@@ -219,6 +248,7 @@ class GUI {
         float zoom = 1.0;
 
         TTF_Font *monoFont;
+        TTF_Font *labelFont;
 
         uint32_t   editValue, editOldValue;
 
@@ -261,5 +291,8 @@ class GUI {
 
         /* Print a key-hint buffer with reverse-video on the key (chars before the first ':') */
         int       printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
+
+        /* Print a buffer using the label font */
+        int       printlb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
 
 };

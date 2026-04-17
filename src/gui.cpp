@@ -7,11 +7,18 @@
 
 void GUI::init(float zoom) {
     this->zoom = zoom;
-    std::string path = ::fontPath(Theme::instance().font_ui);
-    monoFont = TTF_OpenFont(path.c_str(), MONO_SIZE*zoom);
+    std::string uiPath = ::fontPath(Theme::instance().font_ui);
+    monoFont = TTF_OpenFont(uiPath.c_str(), MONO_SIZE*zoom);
 
     if( !monoFont) {
-        std::cout << "Couldn't load font "<< fontPath << std::endl;
+        std::cout << "Couldn't load font "<< uiPath << std::endl;
+        exit(1);
+    }
+
+    std::string labelPath = ::fontPath(Theme::instance().font_ui_labels);
+    labelFont = TTF_OpenFont(labelPath.c_str(), MONO_SIZE*zoom);
+    if( !labelFont) {
+        std::cout << "Couldn't load font "<< labelPath << std::endl;
         exit(1);
     }
 
@@ -542,6 +549,41 @@ int GUI::printb(int x, int y, SDL_Color color, int highlight, SDL_Color backgrou
 
 int GUI::getWidthFor(int characters) {
     return charWidth * characters / zoom;
+}
+
+int GUI::printlb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
+    SDL_Surface *textSurface = TTF_RenderText_Blended(labelFont, buffer, color);
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(sdlRenderer, textSurface);
+
+    if( highlight != 0 ) {
+        int width;
+        int height;
+
+        if( highlight > 0 ) {
+            buffer[highlight] = (char)0;
+            TTF_SizeUTF8(labelFont, buffer, &width, &height);
+            boxRGBA(sdlRenderer, x*zoom, (y+1)*zoom, x*zoom+width, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
+        }
+        else if( highlight < 0 ) {
+            buffer += strlen(buffer)+highlight;
+            TTF_SizeUTF8(labelFont, buffer, &width, &height);
+            boxRGBA(sdlRenderer, x*zoom+textSurface->w-width, (y+1)*zoom, x*zoom+textSurface->w, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
+        }
+    }
+
+    SDL_Rect textRect;
+    textRect.x = x*zoom;
+    textRect.y = y*zoom;
+    textRect.w = textSurface->w;
+    textRect.h = textSurface->h;
+
+    int effectiveWidth = textSurface->w/zoom;
+    SDL_RenderCopy(sdlRenderer, textTexture, NULL, &textRect);
+
+    SDL_DestroyTexture(textTexture);
+    SDL_FreeSurface(textSurface);
+
+    return effectiveWidth;
 }
 
 int GUI::printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
