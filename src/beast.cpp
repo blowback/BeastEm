@@ -630,6 +630,9 @@ void Beast::debugMenu(SDL_Event windowEvent) {
   case SDLK_DOWN:
     updateSelection(1, maxSelection);
     break;
+  case SDLK_TAB:
+    tabSelection((SDL_GetModState() & KMOD_SHIFT) ? -1 : 1);
+    break;
   case SDLK_LEFT:
     if (itemEdit(false)) {
       gui.editDelta(-1);
@@ -1208,6 +1211,30 @@ void Beast::updateSelection(int direction, int maxSelection) {
     if (skip)
       selection += direction;
   } while (skip);
+}
+
+void Beast::tabSelection(int direction) {
+  static const Selection tabStops[] = {
+    SEL_PC, SEL_FLAGS, SEL_PAGING, SEL_A2,
+    SEL_MEM0, SEL_MEM1, SEL_MEM2, SEL_VOLUME
+  };
+  static const int numStops = sizeof(tabStops) / sizeof(tabStops[0]);
+
+  int nextIdx;
+  if (direction > 0) {
+    nextIdx = 0;
+    for (int i = 0; i < numStops; i++) {
+      if (tabStops[i] > selection) { nextIdx = i; break; }
+    }
+  } else {
+    nextIdx = numStops - 1;
+    for (int i = numStops - 1; i >= 0; i--) {
+      if (tabStops[i] < selection) { nextIdx = i; break; }
+    }
+  }
+
+  selection = tabStops[nextIdx] - 1;
+  updateSelection(1, static_cast<int>(SEL_BREAKPOINT));
 }
 
 void Beast::run(bool run) {
