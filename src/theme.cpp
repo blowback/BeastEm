@@ -197,7 +197,8 @@ void Theme::load(Config &config) {
 
     t.text                = src.get("color.text",                {0x00, 0x30, 0x30, 0xFF}, dirty);
     t.menu                = src.get("color.menu",                {0x30, 0x30, 0xA0, 0xFF}, dirty);
-    t.bright              = src.get("color.bright",              {0xD0, 0xFF, 0xD0, 0xFF}, dirty);
+    t.highlight_bg        = src.get("color.highlight.bg",        {0xD0, 0xFF, 0xD0, 0xFF}, dirty);
+    t.highlight_ink       = src.get("color.highlight.ink",       {0x20, 0x20, 0x20, 0xFF}, dirty);
     t.dim                 = src.get("color.dim",                 {0x80, 0x80, 0x80, 0xFF}, dirty);
     t.very_dim            = src.get("color.very_dim",            {0x60, 0x60, 0x60, 0xFF}, dirty);
     t.disabled            = src.get("color.disabled",            {0x90, 0x90, 0xB0, 0xFF}, dirty);

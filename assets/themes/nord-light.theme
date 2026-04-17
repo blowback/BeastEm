@@ -4,7 +4,8 @@
 
 color.text                = #2E3440
 color.menu                = #5E81AC
-color.bright              = #A3BE8C
+color.highlight.bg        = #A3BE8C
+color.highlight.ink       = #2E3440
 color.dim                 = #4C566A
 color.very_dim            = #B0B6C0
 color.disabled            = #9099A6

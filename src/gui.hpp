@@ -129,7 +129,7 @@ class GUI {
                 c = snprintf(buffer, sizeof(buffer), fmt, args...);
             }
             if( c > 0 && c<(int)sizeof(buffer)) {
-                return printb(x,y, color, 0, {0}, buffer);
+                return printfb(monoFont, x, y, color, 0, {0}, buffer);
             }
             return 0;
         }
@@ -143,7 +143,7 @@ class GUI {
                 c = snprintf(buffer, sizeof(buffer), fmt, args...);
             }
             if( c > 0 && c<(int)sizeof(buffer)) {
-                return printb(x,y, color, highlight, background, buffer);
+                return printfb(monoFont, x, y, color, highlight, background, buffer);
             }
             return 0;
         }
@@ -187,7 +187,7 @@ class GUI {
                 c = snprintf(buffer, sizeof(buffer), fmt, args...);
             }
             if( c > 0 && c<(int)sizeof(buffer)) {
-                return printlb(x, y, color, 0, {0}, buffer);
+                return printfb(labelFont, x, y, color, 0, {0}, buffer);
             }
             return 0;
         }
@@ -201,7 +201,7 @@ class GUI {
                 c = snprintf(buffer, sizeof(buffer), fmt, args...);
             }
             if( c > 0 && c<(int)sizeof(buffer)) {
-                return printlb(x, y, color, highlight, background, buffer);
+                return printfb(labelFont, x, y, color, highlight, background, buffer);
             }
             return 0;
         }
@@ -315,14 +315,8 @@ class GUI {
         void      editDigit(uint8_t digit);
         void      prompt();
 
-        /* Print a buffer at the given location, returning the gui width of the displayed string */
-        int       printb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
-
         /* Print a key-hint buffer with reverse-video on the key (chars before the first ':') */
         int       printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
-
-        /* Print a buffer using the label font */
-        int       printlb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
 
         /* Generic: render using the given font */
         int       printfb(TTF_Font *font, int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);

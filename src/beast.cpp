@@ -1906,7 +1906,7 @@ void Beast::onFile() {
           (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
 
   SDL_Color textColor = theme.text;
-  SDL_Color bright = theme.bright;
+  SDL_Color bright = theme.highlight_bg;
   SDL_Color menuColor = theme.menu;
 
   gui.printKeyHint(GUI::COL1, 34, menuColor, "S: Add Source");
@@ -2022,7 +2022,7 @@ void Beast::onDebug() {
   SDL_Color textColor = theme.text;
   SDL_Color disassColor = theme.disassembly;
   SDL_Color highColor = theme.current_pc;
-  SDL_Color bright = theme.bright;
+  SDL_Color bright = theme.highlight_bg;
   SDL_Color menuColor = theme.menu;
   SDL_Color disabledColor = theme.disabled;
 

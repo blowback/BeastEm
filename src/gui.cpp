@@ -404,7 +404,7 @@ void GUI::drawPrompt(bool immediate) {
     SDL_Rect textRect;
 
     SDL_Color color  = theme.edit_ink;
-    SDL_Color bright = theme.bright;
+    SDL_Color bright = theme.highlight_bg;
 
     SDL_Surface *textSurface = TTF_RenderText_Blended(monoFont, promptBuffer, color);
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(sdlRenderer, textSurface);
@@ -442,13 +442,13 @@ void GUI::drawPrompt(bool immediate) {
             std::size_t length = stringValue.copy(buffer, maxLen);
             buffer[length] = '\0';
 
-            printb((promptX + 3*charWidth)/zoom, (promptTop+3*charHeight)/zoom, color, lookupIndex == 0 ? length: 0, bright, buffer);
+            printfb(monoFont, (promptX + 3*charWidth)/zoom, (promptTop+3*charHeight)/zoom, color, lookupIndex == 0 ? length: 0, bright, buffer);
         }
         for (size_t i=0; i<lookupSource->matches() && i<LABEL_LIST_LENGTH; i++ ) {
             std::size_t length = lookupSource->getLabel(i).copy(buffer, maxLen);
             buffer[length] = '\0';
 
-            printb((promptX + charWidth)/zoom,  (promptTop+5*charHeight)/zoom+i*MEM_ROW_HEIGHT, color, lookupIndex == i+1 ? length: 0, bright, buffer);
+            printfb(monoFont, (promptX + charWidth)/zoom,  (promptTop+5*charHeight)/zoom+i*MEM_ROW_HEIGHT, color, lookupIndex == i+1 ? length: 0, bright, buffer);
             if( lookupIndex == i+1 ) {
                 print((promptX + 2*charWidth)/zoom, (promptTop-1*charHeight)/zoom+promptHeight, color, 0, bright, lookupSource->getDescription1(i).c_str());
                 print((promptX + 2*charWidth)/zoom, promptTop/zoom+promptHeight, color, 0, bright, lookupSource->getDescription2(i).c_str());
@@ -522,41 +522,6 @@ void GUI::prompt() {
 }
 
 
-int GUI::printb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
-    SDL_Surface *textSurface = TTF_RenderText_Blended(monoFont, buffer, color);
-    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(sdlRenderer, textSurface);
-
-    if( highlight != 0 ) {  
-        int width;
-        int height;
-
-        if( highlight > 0 ) {
-            buffer[highlight] = (char)0;
-            TTF_SizeUTF8(monoFont, buffer, &width, &height);
-            boxRGBA(sdlRenderer, x*zoom, (y+1)*zoom, x*zoom+width, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
-        }
-        else if( highlight < 0 ) {
-            buffer += strlen(buffer)+highlight;
-            TTF_SizeUTF8(monoFont, buffer, &width, &height);
-            boxRGBA(sdlRenderer, x*zoom+textSurface->w-width, (y+1)*zoom, x*zoom+textSurface->w, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
-        }
-    }
-
-    SDL_Rect textRect;
-    textRect.x = x*zoom; 
-    textRect.y = y*zoom;
-    textRect.w = textSurface->w;
-    textRect.h = textSurface->h;
-
-    int effectiveWidth = textSurface->w/zoom;
-    SDL_RenderCopy(sdlRenderer, textTexture, NULL, &textRect);
-
-    SDL_DestroyTexture(textTexture);
-    SDL_FreeSurface(textSurface);
-
-    return effectiveWidth;
-}
-
 int GUI::getWidthFor(int characters) {
     return charWidth * characters / zoom;
 }
@@ -564,20 +529,7 @@ int GUI::getWidthFor(int characters) {
 int GUI::printfb(TTF_Font *font, int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
     SDL_Surface *textSurface = TTF_RenderText_Blended(font, buffer, color);
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(sdlRenderer, textSurface);
-
-    if (highlight != 0) {
-        int width;
-        int height;
-        if (highlight > 0) {
-            buffer[highlight] = (char)0;
-            TTF_SizeUTF8(font, buffer, &width, &height);
-            boxRGBA(sdlRenderer, x*zoom, (y+1)*zoom, x*zoom+width, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
-        } else {
-            buffer += strlen(buffer)+highlight;
-            TTF_SizeUTF8(font, buffer, &width, &height);
-            boxRGBA(sdlRenderer, x*zoom+textSurface->w-width, (y+1)*zoom, x*zoom+textSurface->w, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
-        }
-    }
+    int effectiveWidth = textSurface->w / zoom;
 
     SDL_Rect textRect;
     textRect.x = x*zoom;
@@ -585,8 +537,46 @@ int GUI::printfb(TTF_Font *font, int x, int y, SDL_Color color, int highlight, S
     textRect.w = textSurface->w;
     textRect.h = textSurface->h;
 
-    int effectiveWidth = textSurface->w/zoom;
+    // Step 1: draw the full text in its normal color
     SDL_RenderCopy(sdlRenderer, textTexture, NULL, &textRect);
+
+    // Step 2/3: for highlighted items, draw the highlight box and re-render the
+    // highlighted substring on top using highlight_ink for readable contrast.
+    if (highlight != 0) {
+        int hWidth, hHeight;
+        int boxX;
+        char savedChar = 0;
+        int savedIdx = -1;
+        char *substr;
+
+        if (highlight > 0) {
+            savedIdx = highlight;
+            savedChar = buffer[highlight];
+            buffer[highlight] = 0;
+            substr = buffer;
+            TTF_SizeUTF8(font, substr, &hWidth, &hHeight);
+            boxX = x*zoom;
+        } else {
+            substr = buffer + strlen(buffer) + highlight;
+            TTF_SizeUTF8(font, substr, &hWidth, &hHeight);
+            boxX = x*zoom + textSurface->w - hWidth;
+        }
+
+        boxRGBA(sdlRenderer, boxX, (y+1)*zoom, boxX + hWidth, (y-2)*zoom + hHeight,
+                background.r, background.g, background.b, 0xFF);
+
+        SDL_Color inkColor = Theme::instance().highlight_ink;
+        SDL_Surface *inkSurface = TTF_RenderText_Blended(font, substr, inkColor);
+        if (inkSurface) {
+            SDL_Texture *inkTexture = SDL_CreateTextureFromSurface(sdlRenderer, inkSurface);
+            SDL_Rect inkRect = {boxX, (int)(y*zoom), inkSurface->w, inkSurface->h};
+            SDL_RenderCopy(sdlRenderer, inkTexture, NULL, &inkRect);
+            SDL_DestroyTexture(inkTexture);
+            SDL_FreeSurface(inkSurface);
+        }
+
+        if (savedIdx >= 0) buffer[savedIdx] = savedChar;
+    }
 
     SDL_DestroyTexture(textTexture);
     SDL_FreeSurface(textSurface);
@@ -602,41 +592,6 @@ static int sizeInGuiUnits(TTF_Font *font, const char *text, float zoom) {
 int GUI::memAddressWidth(const char *text) { return sizeInGuiUnits(memAddrFont, text, zoom); }
 int GUI::memHexWidth(const char *text)     { return sizeInGuiUnits(memHexFont, text, zoom); }
 int GUI::memCharsWidth(const char *text)   { return sizeInGuiUnits(memCharsFont, text, zoom); }
-
-int GUI::printlb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
-    SDL_Surface *textSurface = TTF_RenderText_Blended(labelFont, buffer, color);
-    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(sdlRenderer, textSurface);
-
-    if( highlight != 0 ) {
-        int width;
-        int height;
-
-        if( highlight > 0 ) {
-            buffer[highlight] = (char)0;
-            TTF_SizeUTF8(labelFont, buffer, &width, &height);
-            boxRGBA(sdlRenderer, x*zoom, (y+1)*zoom, x*zoom+width, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
-        }
-        else if( highlight < 0 ) {
-            buffer += strlen(buffer)+highlight;
-            TTF_SizeUTF8(labelFont, buffer, &width, &height);
-            boxRGBA(sdlRenderer, x*zoom+textSurface->w-width, (y+1)*zoom, x*zoom+textSurface->w, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
-        }
-    }
-
-    SDL_Rect textRect;
-    textRect.x = x*zoom;
-    textRect.y = y*zoom;
-    textRect.w = textSurface->w;
-    textRect.h = textSurface->h;
-
-    int effectiveWidth = textSurface->w/zoom;
-    SDL_RenderCopy(sdlRenderer, textTexture, NULL, &textRect);
-
-    SDL_DestroyTexture(textTexture);
-    SDL_FreeSurface(textSurface);
-
-    return effectiveWidth;
-}
 
 int GUI::printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
     int avg = (color.r + color.g + color.b) / 3;

@@ -25,7 +25,8 @@ struct Theme {
     // Common UI
     SDL_Color text;
     SDL_Color menu;
-    SDL_Color bright;
+    SDL_Color highlight_bg;   // background of a highlighted / selected item (was: bright)
+    SDL_Color highlight_ink;  // ink color used on top of highlight_bg
     SDL_Color dim;
     SDL_Color very_dim;
     SDL_Color disabled;

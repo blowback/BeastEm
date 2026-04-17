@@ -25,7 +25,7 @@ class HelpGui {
 
             SDL_Color textColor = theme.text;
             SDL_Color menuColor = theme.menu;
-            SDL_Color bright = theme.bright;
+            SDL_Color bright = theme.highlight_bg;
 
             drawCentered(GUI::ROW1, TITLE_STRING.c_str(), gui, menuColor, sdlRenderer, screenWidth, zoom);
             

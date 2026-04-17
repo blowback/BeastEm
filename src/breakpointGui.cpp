@@ -228,7 +228,7 @@ void BreakpointGui::drawBreakpoints() {
   SDL_Color textColor = theme.text;
   SDL_Color dimColor = theme.dim;
   SDL_Color menuColor = theme.menu;
-  SDL_Color bright = theme.bright;
+  SDL_Color bright = theme.highlight_bg;
 
   size_t bpCount = debugManager->getBreakpointCount();
 
@@ -304,7 +304,7 @@ void BreakpointGui::drawWatchpoints() {
   SDL_Color textColor = theme.text;
   SDL_Color dimColor = theme.dim;
   SDL_Color menuColor = theme.menu;
-  SDL_Color bright = theme.bright;
+  SDL_Color bright = theme.highlight_bg;
 
   size_t wpCount = debugManager->getWatchpointCount();
 
@@ -652,7 +652,7 @@ void BreakpointGui::drawTraceLog() {
   SDL_Color textColor = theme.text;
   SDL_Color highColor = theme.current_pc;
   SDL_Color menuColor = theme.menu;
-  SDL_Color bright = theme.bright;
+  SDL_Color bright = theme.highlight_bg;
 
   // Title and navigation hint
   gui->print(GUI::COL1, 34, menuColor, "TRACELOG");

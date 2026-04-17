@@ -3,7 +3,8 @@
 
 color.text                = #C6D0F5
 color.menu                = #8CAAEE
-color.bright              = #A6D189
+color.highlight.bg        = #A6D189
+color.highlight.ink       = #303446
 color.dim                 = #838BA7
 color.very_dim            = #626880
 color.disabled            = #737994
