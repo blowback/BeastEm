@@ -224,6 +224,8 @@ void BreakpointGui::drawBreakpoints() {
   const Theme &theme = Theme::instance();
   boxRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
           (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
+  rectangleRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
+                (screenHeight - 24) * zoom, theme.border.r, theme.border.g, theme.border.b, theme.border.a);
 
   SDL_Color textColor = theme.text;
   SDL_Color dimColor = theme.dim;

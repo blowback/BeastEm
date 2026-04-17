@@ -400,6 +400,7 @@ void GUI::drawPrompt(bool immediate) {
 
     int promptTop = promptY-zoom*promptHeight/2-charHeight;
     boxRGBA(sdlRenderer, promptX-2*charWidth, promptTop, promptX+promptWidth+2*charWidth, promptY+zoom*promptHeight/2+charHeight, background.r, background.g, background.b, 0xFF);
+    rectangleRGBA(sdlRenderer, promptX-2*charWidth, promptTop, promptX+promptWidth+2*charWidth, promptY+zoom*promptHeight/2+charHeight, theme.border.r, theme.border.g, theme.border.b, theme.border.a);
 
     SDL_Rect textRect;
 

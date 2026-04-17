@@ -196,6 +196,8 @@ void Theme::load(Config &config) {
     t.font_pagemap_address  = src.getStr("font.pagemap.address",  "Roboto-Medium.ttf", dirty);
 
     t.text                = src.get("color.text",                {0x00, 0x30, 0x30, 0xFF}, dirty);
+    SDL_Color borderDefault = {t.text.r, t.text.g, t.text.b, 0x80};
+    t.border              = src.get("color.border",              borderDefault, dirty);
     t.menu                = src.get("color.menu",                {0x30, 0x30, 0xA0, 0xFF}, dirty);
     t.highlight_bg        = src.get("color.highlight.bg",        {0xD0, 0xFF, 0xD0, 0xFF}, dirty);
     t.highlight_ink       = src.get("color.highlight.ink",       {0x20, 0x20, 0x20, 0xFF}, dirty);
