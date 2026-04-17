@@ -4,6 +4,7 @@
 #include "config.hpp"
 #include "listing.hpp"
 #include "nfd.h"
+#include "theme.hpp"
 #include "z80.h"
 #include "z80pio.h"
 #include <algorithm>
@@ -79,9 +80,13 @@ Beast::Beast(SDL_Window *window, int screenWidth, int screenHeight, float zoom,
     std::string path = configPath();
     if (!path.empty()) {
       Config cfg(path);
+      Theme::load(cfg);
       if (cfg.getBool("help_shown", false)) {
         mode = GUI::DEBUG;
       }
+    } else {
+      Config cfg("");
+      Theme::load(cfg);
     }
   }
 
@@ -308,7 +313,8 @@ void Beast::drawKeys() {
 
   SDL_SetRenderTarget(sdlRenderer, keyboardTexture);
 
-  SDL_SetRenderDrawColor(sdlRenderer, 0xE0, 0xE0, 0xF0, SDL_ALPHA_OPAQUE);
+  const Theme &theme = Theme::instance();
+  SDL_SetRenderDrawColor(sdlRenderer, theme.keyboard_bg.r, theme.keyboard_bg.g, theme.keyboard_bg.b, theme.keyboard_bg.a);
   SDL_RenderClear(sdlRenderer);
 
   for (int col = 0; col < KEY_COLS; col++) {
@@ -319,7 +325,7 @@ void Beast::drawKeys() {
     }
   }
   // Render to window again...
-  SDL_SetRenderDrawColor(sdlRenderer, 0x0, 0x0, 0x0, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderDrawColor(sdlRenderer, theme.screen_bg.r, theme.screen_bg.g, theme.screen_bg.b, theme.screen_bg.a);
   SDL_SetRenderTarget(sdlRenderer, NULL);
 }
 
@@ -329,12 +335,13 @@ void Beast::drawKey(int col, int row, int offsetX, int offsetY, bool pressed) {
   int x1 = (offsetX + col * KEY_WIDTH + KEY_INDENTS[row]) * zoom;
   int y1 = (offsetY + row * KEY_HEIGHT) * zoom;
   int rad = 5 * zoom;
-  SDL_Color keyColour = {0, 0, 0};
+  const Theme &theme = Theme::instance();
+  SDL_Color keyColour = theme.key_cap;
 
   if (pressed) {
     roundedBoxRGBA(sdlRenderer, x1 + 5 * zoom, y1 + 5 * zoom,
                    x1 + (KEY_WIDTH - 5) * zoom, y1 + (KEY_HEIGHT - 5) * zoom,
-                   rad, 0xA0, 0xA0, 0xA0, 0xFF);
+                   rad, theme.key_pressed.r, theme.key_pressed.g, theme.key_pressed.b, theme.key_pressed.a);
   }
 
   bool isSmall = strlen(KEY_CAPS[col + row * KEY_COLS]) > 1;
@@ -1889,12 +1896,13 @@ void Beast::editComplete() {
 }
 
 void Beast::onFile() {
+  const Theme &theme = Theme::instance();
   boxRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
-          (screenHeight - 24) * zoom, 0xF0, 0xF0, 0xE0, 0xE8);
+          (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
 
-  SDL_Color textColor = {0, 0x30, 0x30};
-  SDL_Color bright = {0xD0, 0xFF, 0xD0};
-  SDL_Color menuColor = {0x30, 0x30, 0xA0};
+  SDL_Color textColor = theme.text;
+  SDL_Color bright = theme.bright;
+  SDL_Color menuColor = theme.menu;
 
   gui.printKeyHint(GUI::COL1, 34, menuColor, "S: Add Source");
 
@@ -2002,15 +2010,16 @@ void Beast::checkWatchedFiles() {
 }
 
 void Beast::onDebug() {
+  const Theme &theme = Theme::instance();
   boxRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
-          (screenHeight - 24) * zoom, 0xF0, 0xF0, 0xE0, 0xE8);
+          (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
 
-  SDL_Color textColor = {0, 0x30, 0x30};
-  SDL_Color disassColor = {0x60, 0, 0x60};
-  SDL_Color highColor = {0xA0, 0x30, 0x30};
-  SDL_Color bright = {0xD0, 0xFF, 0xD0};
-  SDL_Color menuColor = {0x30, 0x30, 0xA0};
-  SDL_Color disabledColor = {0x90, 0x90, 0xB0};
+  SDL_Color textColor = theme.text;
+  SDL_Color disassColor = theme.disassembly;
+  SDL_Color highColor = theme.current_pc;
+  SDL_Color bright = theme.bright;
+  SDL_Color menuColor = theme.menu;
+  SDL_Color disabledColor = theme.disabled;
 
   gui.printKeyHint(GUI::COL1, 34, menuColor, "R: Run");
   gui.printKeyHint(GUI::COL2, 34, menuColor, "S: Step");
@@ -2567,7 +2576,8 @@ void Beast::drawListing(int page, uint16_t listAddress, SDL_Color textColor,
   // Draw breakpoint and watchpoint indicators (only in DEBUG mode)
   if (mode == GUI::DEBUG) {
     const int indicatorRadius = 6 * zoom; // Radius for BP/WP circles
-    const SDL_Color indicatorTextColor = {255, 255, 255, 255};
+    const Theme &theme = Theme::instance();
+    const SDL_Color indicatorTextColor = theme.indicator_text;
 
     for (int i = 0; i < lineCount; i++) {
       // Only show indicators on lines that have actual opcodes
@@ -2599,14 +2609,14 @@ void Beast::drawListing(int page, uint16_t listAddress, SDL_Color textColor,
 
       // Draw breakpoint indicator
       if (hasBreakpoint) {
-        uint8_t alpha = bpInfo->enabled ? BP_ALPHA_ENABLED : BP_ALPHA_DISABLED;
+        SDL_Color c;
         if (bpInfo->isTrace) {
-          filledCircleRGBA(sdlRenderer, bpCircleX, circleY, indicatorRadius,
-                           TRACE_COLOR_R, TRACE_COLOR_G, TRACE_COLOR_B, alpha);
+          c = bpInfo->enabled ? theme.trace_enabled : theme.trace_disabled;
         } else {
-          filledCircleRGBA(sdlRenderer, bpCircleX, circleY, indicatorRadius,
-                           BP_COLOR_R, BP_COLOR_G, BP_COLOR_B, alpha);
+          c = bpInfo->enabled ? theme.breakpoint_enabled : theme.breakpoint_disabled;
         }
+        filledCircleRGBA(sdlRenderer, bpCircleX, circleY, indicatorRadius,
+                         c.r, c.g, c.b, c.a);
         // Draw the breakpoint number (1-8) centered in the circle
         char numStr[4];
         snprintf(numStr, sizeof(numStr), "%d",
@@ -2630,7 +2640,7 @@ void Beast::drawListing(int page, uint16_t listAddress, SDL_Color textColor,
       // Draw watchpoint trigger indicator
       if (hasWatchpointTrigger) {
         filledCircleRGBA(sdlRenderer, wpCircleX, circleY, indicatorRadius,
-                         WP_COLOR_R, WP_COLOR_G, WP_COLOR_B, 255);
+                         theme.watchpoint.r, theme.watchpoint.g, theme.watchpoint.b, theme.watchpoint.a);
 
         // Draw the watchpoint number (1-8) centered in the circle
         char numStr[4];
@@ -2933,7 +2943,8 @@ void Beast::drawBeast() {
 
   int pcbHeight = (int)((screenWidth / (float)size.x) * size.y);
 
-  SDL_SetRenderDrawColor(sdlRenderer, 0x0, 0x0, 0x0, SDL_ALPHA_OPAQUE);
+  const Theme &theme = Theme::instance();
+  SDL_SetRenderDrawColor(sdlRenderer, theme.screen_bg.r, theme.screen_bg.g, theme.screen_bg.b, theme.screen_bg.a);
   SDL_RenderClear(sdlRenderer);
   SDL_Rect textRect = {0, (int)(keyboardTop * zoom),
                        (int)(KEYBOARD_WIDTH * zoom),

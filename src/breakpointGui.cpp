@@ -1,4 +1,5 @@
 #include "breakpointGui.hpp"
+#include "theme.hpp"
 
 BreakpointGui::BreakpointGui(SDL_Renderer *sdlRenderer, int screenWidth, int screenHeight, float zoom, GUI *gui, DebugManager *debugManager) {
     this->sdlRenderer = sdlRenderer;
@@ -220,13 +221,14 @@ void BreakpointGui::breakpointTextEvent() {
 }
 
 void BreakpointGui::drawBreakpoints() {
+  const Theme &theme = Theme::instance();
   boxRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
-          (screenHeight - 24) * zoom, 0xF0, 0xF0, 0xE0, 0xE8);
+          (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
 
-  SDL_Color textColor = {0, 0x30, 0x30, 255};
-  SDL_Color dimColor = {0x80, 0x80, 0x80, 255};
-  SDL_Color menuColor = {0x30, 0x30, 0xA0, 255};
-  SDL_Color bright = {0xD0, 0xFF, 0xD0, 255};
+  SDL_Color textColor = theme.text;
+  SDL_Color dimColor = theme.dim;
+  SDL_Color menuColor = theme.menu;
+  SDL_Color bright = theme.bright;
 
   size_t bpCount = debugManager->getBreakpointCount();
 
@@ -270,7 +272,7 @@ void BreakpointGui::drawBreakpoints() {
       }
     } else {
       // Empty slot - show dashes matching address width
-      SDL_Color veryDimColor = {0x60, 0x60, 0x60, 255};
+      SDL_Color veryDimColor = theme.very_dim;
       gui->print(GUI::COL1, row, veryDimColor, isSelected ? 22 : 0, bright,
                 " %d    -------  ---", i + 1);
     }
@@ -295,13 +297,14 @@ void BreakpointGui::drawBreakpoints() {
 }
 
 void BreakpointGui::drawWatchpoints() {
+  const Theme &theme = Theme::instance();
   boxRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
-          (screenHeight - 24) * zoom, 0xF0, 0xF0, 0xE0, 0xE8);
+          (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
 
-  SDL_Color textColor = {0, 0x30, 0x30, 255};
-  SDL_Color dimColor = {0x80, 0x80, 0x80, 255};
-  SDL_Color menuColor = {0x30, 0x30, 0xA0, 255};
-  SDL_Color bright = {0xD0, 0xFF, 0xD0, 255};
+  SDL_Color textColor = theme.text;
+  SDL_Color dimColor = theme.dim;
+  SDL_Color menuColor = theme.menu;
+  SDL_Color bright = theme.bright;
 
   size_t wpCount = debugManager->getWatchpointCount();
 
@@ -342,7 +345,7 @@ void BreakpointGui::drawWatchpoints() {
         // Editing type field - highlight just the type with yellow background
         // Only show row highlight when editing existing (not when adding new)
         int highlight = watchpointAddMode ? 0 : 40;
-        SDL_Color yellow = {0xFF, 0xFF, 0x80, 255};
+        SDL_Color yellow = theme.yellow;
         if (watchpointEditIsPhysical) {
           gui->print(GUI::COL1, row, textColor, highlight, bright,
                     " %d    0x%05X  0x%04X   ", i + 1, watchpointEditAddress,
@@ -379,7 +382,7 @@ void BreakpointGui::drawWatchpoints() {
       }
     } else {
       // Empty slot - dashes matching column widths
-      SDL_Color veryDimColor = {0x60, 0x60, 0x60, 255};
+      SDL_Color veryDimColor = theme.very_dim;
       gui->print(GUI::COL1, row, veryDimColor, isSelected ? 40 : 0, bright,
                 " %d    -------  ------    --    ---", i + 1);
     }
@@ -642,13 +645,14 @@ GUI::Mode BreakpointGui::watchpointsMenu(SDL_Event windowEvent, GUI::Mode mode) 
 
 
 void BreakpointGui::drawTraceLog() {
+  const Theme &theme = Theme::instance();
   boxRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
-          (screenHeight - 24) * zoom, 0xF0, 0xF0, 0xE0, 0xE8);
+          (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
 
-  SDL_Color textColor = {0, 0x30, 0x30, 255};
-  SDL_Color highColor = {0xA0, 0x30, 0x30};
-  SDL_Color menuColor = {0x30, 0x30, 0xA0, 255};
-  SDL_Color bright = {0xD0, 0xFF, 0xD0, 255};
+  SDL_Color textColor = theme.text;
+  SDL_Color highColor = theme.current_pc;
+  SDL_Color menuColor = theme.menu;
+  SDL_Color bright = theme.bright;
 
   // Title and navigation hint
   gui->print(GUI::COL1, 34, menuColor, "TRACELOG");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui.hpp"
+#include "theme.hpp"
 
 const std::string TITLE_STRING = "Feersum MicroBeast Emulator";
 
@@ -18,12 +19,13 @@ class HelpGui {
         }
 
         static void drawHelp(SDL_Renderer *sdlRenderer, int screenWidth, int screenHeight, float zoom, GUI *gui) {
+            const Theme &theme = Theme::instance();
             boxRGBA(sdlRenderer, 32 * zoom, 32 * zoom, (screenWidth - 24) * zoom,
-                    (screenHeight - 24) * zoom, 0xF0, 0xF0, 0xE0, 0xE8);
+                    (screenHeight - 24) * zoom, theme.dialog_bg.r, theme.dialog_bg.g, theme.dialog_bg.b, theme.dialog_bg.a);
 
-            SDL_Color textColor = {0, 0x30, 0x30, 255};
-            SDL_Color menuColor = {0x30, 0x30, 0xA0, 255};
-            SDL_Color bright = {0xD0, 0xFF, 0xD0, 255};
+            SDL_Color textColor = theme.text;
+            SDL_Color menuColor = theme.menu;
+            SDL_Color bright = theme.bright;
 
             drawCentered(GUI::ROW1, TITLE_STRING.c_str(), gui, menuColor, sdlRenderer, screenWidth, zoom);
             

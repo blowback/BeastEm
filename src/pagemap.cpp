@@ -1,6 +1,7 @@
 #include "pagemap.hpp"
 #include "assets.hpp"
 #include "SDL2_gfxPrimitives.h"
+#include "theme.hpp"
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
@@ -113,24 +114,26 @@ void PageMap::printRotated(TTF_Font *f, int cx, int cy, double angle, SDL_Color 
 void PageMap::draw(const uint8_t memoryPage[4], bool pagingEnabled, bool videoBeastEnabled) {
     if( !window ) return;
 
+    const Theme &theme = Theme::instance();
+
     // Clear window background
-    SDL_SetRenderDrawColor(renderer, 0xF0, 0xF0, 0xE0, 0xFF);
+    SDL_SetRenderDrawColor(renderer, theme.pagemap_bg.r, theme.pagemap_bg.g, theme.pagemap_bg.b, theme.pagemap_bg.a);
     SDL_RenderClear(renderer);
 
-    SDL_Color menuColor = {0x30, 0x30, 0xA0, 255};
-    SDL_Color addrColor = {0x60, 0x60, 0x60, 255};  // Lighter for addresses
-    SDL_Color darkText = {0x20, 0x20, 0x20, 255};
-    SDL_Color lightText = {0xFF, 0xFF, 0xFF, 255};
-    SDL_Color borderColor = {0x40, 0x40, 0x40, 255};
+    SDL_Color menuColor = theme.menu;
+    SDL_Color addrColor = theme.page_addr;
+    SDL_Color darkText = theme.page_dark_text;
+    SDL_Color lightText = theme.page_light_text;
+    SDL_Color borderColor = theme.page_border;
 
-    // Page purpose colours (from microbeast_memory_map.svg)
-    SDL_Color cpmColor     = {73, 147, 243, 255};
-    SDL_Color ramDiskColor = {77, 178, 187, 255};
-    SDL_Color freeColor    = {188, 236, 241, 255};
-    SDL_Color restoreColor = {246, 107, 113, 255};
-    SDL_Color romDiskColor = {177, 77, 180, 255};
-    SDL_Color bootColor    = {249, 208, 251, 255};
-    SDL_Color vconsoleColor = {44, 34, 242, 255};
+    // Page purpose colours
+    SDL_Color cpmColor     = theme.page_cpm;
+    SDL_Color ramDiskColor = theme.page_ramdisk;
+    SDL_Color freeColor    = theme.page_free;
+    SDL_Color restoreColor = theme.page_restore;
+    SDL_Color romDiskColor = theme.page_romdisk;
+    SDL_Color bootColor    = theme.page_boot;
+    SDL_Color vconsoleColor = theme.page_vconsole;
 
     // Title
     print(font, 20, 8, menuColor, "PAGE MAP");
@@ -322,7 +325,7 @@ void PageMap::draw(const uint8_t memoryPage[4], bool pagingEnabled, bool videoBe
     int centreTopY = topY + (colHeight - 4 * boxHeight) / 2;
 
     // VideoBeast colour for pages in 0x40-0x5F range
-    SDL_Color videoBeastColor = {0x80, 0x80, 0x80, 255};
+    SDL_Color videoBeastColor = theme.page_videobeast;
 
     // Bank ordering: high addresses at top to match physical columns
     const int bankOrder[4] = {3, 2, 1, 0};
@@ -519,7 +522,7 @@ void PageMap::draw(const uint8_t memoryPage[4], bool pagingEnabled, bool videoBe
             SDL_SetRenderDrawColor(renderer, hintColor.r, hintColor.g, hintColor.b, 0xFF);
             SDL_RenderFillRect(renderer, &r);
 
-            SDL_Color keyTextColor = {0xE0, 0xE0, 0xE0, 0xFF};
+            SDL_Color keyTextColor = theme.key_ink;
             print(monoFont, baseX, baseY, keyTextColor, "%s", keyBuf);
             print(monoFont, baseX + kw, baseY, hintColor, "%s", legend + keyLen);
         } else {

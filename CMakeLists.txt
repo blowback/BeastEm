@@ -65,6 +65,7 @@ add_executable(beastem
     src/display.cpp
     src/instructions.cpp
     src/rtc.cpp
+    src/theme.cpp
 )
 
 # nfd cmake adds relevant platform GUI libraries to link_directories etc...

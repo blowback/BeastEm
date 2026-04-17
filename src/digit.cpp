@@ -1,4 +1,5 @@
 #include "digit.hpp"
+#include "theme.hpp"
 #include <iostream>
 
 Digit::Digit(SDL_Renderer *renderer, float zoom) {
@@ -90,13 +91,14 @@ void Digit::addTo(std::vector<short>&v, int offset, std::initializer_list<int> l
 }
 
 void Digit::refresh(SDL_Renderer *renderer) {
+    const Theme &theme = Theme::instance();
     SDL_SetRenderTarget(renderer, digitTexture);
-    SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x40, SDL_ALPHA_OPAQUE);
+    SDL_SetRenderDrawColor(renderer, theme.digit_bg.r, theme.digit_bg.g, theme.digit_bg.b, theme.digit_bg.a);
     SDL_RenderClear(renderer);
 
     for(int i=0; i<15; i++) {
         if( ((segmentFlags >> i) & 0x01) == 0x01) {
-            filledPolygonRGBA(renderer, &DISPLAY_SEGMENTS_X[i][0], &DISPLAY_SEGMENTS_Y[i][0], DISPLAY_SEGMENTS_X[i].size(), 0xF0, 0xF0, 0xFF, brightness[i]);
+            filledPolygonRGBA(renderer, &DISPLAY_SEGMENTS_X[i][0], &DISPLAY_SEGMENTS_Y[i][0], DISPLAY_SEGMENTS_X[i].size(), theme.digit_on.r, theme.digit_on.g, theme.digit_on.b, brightness[i]);
         }
     }
     SDL_SetRenderTarget(renderer, NULL);

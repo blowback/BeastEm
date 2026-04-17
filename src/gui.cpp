@@ -1,5 +1,6 @@
 #include "gui.hpp"
 #include "assets.hpp"
+#include "theme.hpp"
 #include <iostream>
 #include <cstring>
 #include <stdio.h>
@@ -106,15 +107,16 @@ void GUI::drawEdit() {
     int width;
     int height;
 
-    SDL_Color background = {0xFF, 0xFF, 0xFF};
+    const Theme &theme = Theme::instance();
+    SDL_Color background = theme.edit_bg;
 
     TTF_SizeUTF8(monoFont, buffer, &width, &height);
     boxRGBA(sdlRenderer, editX*zoom+(width*(editOffset-1))-1, (editY+1)*zoom, editX*zoom+(width*(editOffset+editLength-1)), (editY-2)*zoom+height, background.r, background.g, background.b, 0xFF);
 
     SDL_Rect textRect;
 
-    SDL_Color normal = {0x00, 0x00, 0x00};
-    SDL_Color edited = {0xF0, 0x40, 0x40};
+    SDL_Color normal = theme.edit_ink;
+    SDL_Color edited = theme.edit_highlight;
 
     for( int i=editLength-1; i>=0; i--) {
         bool isCurrentIndex = i == editIndex;
@@ -376,15 +378,16 @@ bool GUI::endPrompt(bool forceClose) {
 
 void GUI::drawPrompt(bool immediate) {
     if(!promptStarted || promptCompleted) return;
-    SDL_Color background = {0xF0, 0xF0, 0xFF};
+    const Theme &theme = Theme::instance();
+    SDL_Color background = theme.prompt_bg;
 
     int promptTop = promptY-zoom*promptHeight/2-charHeight;
     boxRGBA(sdlRenderer, promptX-2*charWidth, promptTop, promptX+promptWidth+2*charWidth, promptY+zoom*promptHeight/2+charHeight, background.r, background.g, background.b, 0xFF);
 
     SDL_Rect textRect;
 
-    SDL_Color color  = {0x00, 0x00, 0x00};
-    SDL_Color bright = {0xD0, 0xFF, 0xD0};
+    SDL_Color color  = theme.edit_ink;
+    SDL_Color bright = theme.bright;
 
     SDL_Surface *textSurface = TTF_RenderText_Blended(monoFont, promptBuffer, color);
     SDL_Texture *textTexture = SDL_CreateTextureFromSurface(sdlRenderer, textSurface);
@@ -552,7 +555,7 @@ int GUI::printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color b
     int keyLen = (int)(colon - buffer);
     int keyWidth = getWidthFor(keyLen);
 
-    SDL_Color keyTextColor = {0xE0, 0xE0, 0xE0, 0xFF};
+    SDL_Color keyTextColor = Theme::instance().key_ink;
     char savedChar = buffer[keyLen];
     buffer[keyLen] = '\0';
     printb(x, y, keyTextColor, keyLen, hintColor, buffer);
