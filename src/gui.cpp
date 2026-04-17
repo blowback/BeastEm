@@ -7,8 +7,8 @@
 
 void GUI::init(float zoom) {
     this->zoom = zoom;
-    std::string fontPath = assetPath(MONO_FONT);
-    monoFont = TTF_OpenFont(fontPath.c_str(), MONO_SIZE*zoom);
+    std::string path = ::fontPath(Theme::instance().font_ui);
+    monoFont = TTF_OpenFont(path.c_str(), MONO_SIZE*zoom);
 
     if( !monoFont) {
         std::cout << "Couldn't load font "<< fontPath << std::endl;

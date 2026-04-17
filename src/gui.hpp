@@ -210,7 +210,6 @@ class GUI {
 
     private:
     
-        const char* MONO_FONT = "RobotoMono-VariableFont_wght.ttf";
         const int   MONO_SIZE = 14;
 
         SDL_Renderer  *sdlRenderer;

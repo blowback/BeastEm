@@ -70,25 +70,49 @@ static bool sectionHasColors(const Config &config, const std::string &section) {
 struct ThemeSource {
     enum class Mode { Section, File };
     Mode mode;
-    Config *userConfig = nullptr;   // for Section mode (write-back target)
-    Config *fileConfig = nullptr;   // for File mode (read-only)
-    std::string section;            // for Section mode
+    Config *userConfig = nullptr;   // always set (top-level override source + Section write-back)
+    Config *fileConfig = nullptr;   // set in File mode
+    std::string section;            // set in Section mode
 
     SDL_Color get(const std::string &key, SDL_Color def, bool &dirty) const {
+        // Top-level override in user config wins over everything.
+        std::string override = userConfig->getString("", key, "");
+        SDL_Color parsed;
+        if (!override.empty() && parseHexColor(override, parsed)) return parsed;
+
         if (mode == Mode::File) {
             std::string current = fileConfig->getString("", key, "");
-            SDL_Color parsed;
             if (!current.empty() && parseHexColor(current, parsed)) return parsed;
             return def;
         }
         std::string current = userConfig->getString(section, key, "");
-        SDL_Color parsed;
         if (!current.empty() && parseHexColor(current, parsed)) return parsed;
         userConfig->setString(section, key, formatColor(def));
         dirty = true;
         return def;
     }
+
+    std::string getStr(const std::string &key, const std::string &def, bool &dirty) const {
+        std::string override = userConfig->getString("", key, "");
+        if (!override.empty()) return override;
+
+        if (mode == Mode::File) {
+            std::string current = fileConfig->getString("", key, "");
+            return current.empty() ? def : current;
+        }
+        std::string current = userConfig->getString(section, key, "");
+        if (!current.empty()) return current;
+        userConfig->setString(section, key, def);
+        dirty = true;
+        return def;
+    }
 };
+
+std::string fontPath(const std::string &name) {
+    if (name.empty()) return "";
+    if (name[0] == '/' || name[0] == '.' || name[0] == '~') return name;
+    return assetPath("fonts/" + name);
+}
 
 Theme& Theme::instance() {
     static Theme t;
@@ -123,6 +147,7 @@ void Theme::load(Config &config) {
     }
 
     ThemeSource src;
+    src.userConfig = &config;  // always set — top-level overrides come from here
     Config fileConfig(""); // populated below if needed
 
     auto tryLoadFile = [&](const std::string &path) -> bool {
@@ -155,6 +180,14 @@ void Theme::load(Config &config) {
             src.section = section;
         }
     }
+
+    t.font_ui               = src.getStr("font.ui",               "RobotoMono-VariableFont_wght.ttf", dirty);
+    t.font_ui_indicators    = src.getStr("font.ui.indicators",    "Roboto-Medium.ttf", dirty);
+    t.font_key_caps         = src.getStr("font.key.caps",         "Roboto-Medium.ttf", dirty);
+    t.font_key_narrow       = src.getStr("font.key.narrow",       "Roboto-Medium.ttf", dirty);
+    t.font_key_modifiers    = src.getStr("font.key.modifiers",    "Roboto-Medium.ttf", dirty);
+    t.font_pagemap_label    = src.getStr("font.pagemap.label",    "Roboto-Medium.ttf", dirty);
+    t.font_pagemap_address  = src.getStr("font.pagemap.address",  "Roboto-Medium.ttf", dirty);
 
     t.text                = src.get("color.text",                {0x00, 0x30, 0x30, 0xFF}, dirty);
     t.menu                = src.get("color.menu",                {0x30, 0x30, 0xA0, 0xFF}, dirty);

@@ -290,7 +290,6 @@ class Beast {
         const int KEYBOARD_WIDTH = KEY_WIDTH*(KEY_COLS+0.5);
         const int KEYBOARD_HEIGHT= KEY_HEIGHT*KEY_ROWS;
 
-        const char* BEAST_FONT="Roboto-Medium.ttf";
         const int FONT_SIZE = 28;
         const int SMALL_FONT_SIZE = 14;
         const int MID_FONT_SIZE = 14;

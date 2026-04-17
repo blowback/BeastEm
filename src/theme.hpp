@@ -1,9 +1,21 @@
 #pragma once
 
+#include <string>
+
 #include "SDL.h"
 #include "config.hpp"
 
 struct Theme {
+    // Fonts (filenames relative to assets/fonts/, or absolute paths).
+    // Semantic slots — each UI region can use a different font.
+    std::string font_ui;                // the whole debug GUI (monospace)
+    std::string font_ui_indicators;     // breakpoint / watchpoint number badges
+    std::string font_key_caps;          // main label on virtual keyboard keys
+    std::string font_key_narrow;        // narrow keys (Shift, Ctrl, …)
+    std::string font_key_modifiers;     // secondary labels (Shift+X / Ctrl+X)
+    std::string font_pagemap_label;     // pagemap titles + page numbers
+    std::string font_pagemap_address;   // pagemap small address labels
+
     // Common UI
     SDL_Color text;
     SDL_Color menu;
@@ -61,3 +73,8 @@ struct Theme {
     static Theme& instance();
     static void load(Config &config);
 };
+
+// Resolves a font name to a full asset path. If `name` is an absolute path
+// or starts with ./ / ~/ it is returned as-is; otherwise prefixed with
+// assets/fonts/.
+std::string fontPath(const std::string &name);

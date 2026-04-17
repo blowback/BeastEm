@@ -35,10 +35,12 @@ void PageMap::toggle() {
             window = nullptr;
             return;
         }
-        std::string fontPath = assetPath("Roboto-Medium.ttf");
-        font = TTF_OpenFont(fontPath.c_str(), 13);
-        smallFont = TTF_OpenFont(fontPath.c_str(), 11);
-        std::string monoPath = assetPath("RobotoMono-VariableFont_wght.ttf");
+        const Theme &theme = Theme::instance();
+        std::string labelPath   = ::fontPath(theme.font_pagemap_label);
+        std::string addressPath = ::fontPath(theme.font_pagemap_address);
+        std::string monoPath    = ::fontPath(theme.font_ui);
+        font = TTF_OpenFont(labelPath.c_str(), 13);
+        smallFont = TTF_OpenFont(addressPath.c_str(), 11);
         monoFont = TTF_OpenFont(monoPath.c_str(), 14);
         fontH = textHeight(font);
         smallFontH = textHeight(smallFont);

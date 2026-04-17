@@ -37,6 +37,21 @@ Beast::Beast(SDL_Window *window, int screenWidth, int screenHeight, float zoom,
   this->zoom = checkZoomFactor(screenWidth, screenHeight, zoom);
 
   TTF_Init();
+
+  {
+    std::string path = configPath();
+    if (!path.empty()) {
+      Config cfg(path);
+      Theme::load(cfg);
+      if (cfg.getBool("help_shown", false)) {
+        mode = GUI::DEBUG;
+      }
+    } else {
+      Config cfg("");
+      Theme::load(cfg);
+    }
+  }
+
   gui.init(this->zoom);
 
   instr = new Instructions();
@@ -53,41 +68,31 @@ Beast::Beast(SDL_Window *window, int screenWidth, int screenHeight, float zoom,
   i2c->addDevice(display2);
   i2c->addDevice(rtc);
 
-  std::string fontPath = assetPath(BEAST_FONT);
-  font = TTF_OpenFont(fontPath.c_str(), FONT_SIZE * zoom);
+  const Theme &theme = Theme::instance();
+  std::string keycapsPath        = ::fontPath(theme.font_key_caps);
+  std::string narrowKeysPath     = ::fontPath(theme.font_key_narrow);
+  std::string keyModifiersPath   = ::fontPath(theme.font_key_modifiers);
+  std::string indicatorPath      = ::fontPath(theme.font_ui_indicators);
 
+  font = TTF_OpenFont(keycapsPath.c_str(), FONT_SIZE * zoom);
   if (!font) {
-    std::cout << "Couldn't load font " << fontPath << std::endl;
+    std::cout << "Couldn't load font " << keycapsPath << std::endl;
     exit(1);
   }
-  smallFont = TTF_OpenFont(fontPath.c_str(), SMALL_FONT_SIZE * zoom);
+  smallFont = TTF_OpenFont(narrowKeysPath.c_str(), SMALL_FONT_SIZE * zoom);
   if (!smallFont) {
-    std::cout << "Couldn't load font " << fontPath << std::endl;
+    std::cout << "Couldn't load font " << narrowKeysPath << std::endl;
     exit(1);
   }
-  midFont = TTF_OpenFont(fontPath.c_str(), MID_FONT_SIZE * zoom);
+  midFont = TTF_OpenFont(keyModifiersPath.c_str(), MID_FONT_SIZE * zoom);
   if (!midFont) {
-    std::cout << "Couldn't load font " << fontPath << std::endl;
+    std::cout << "Couldn't load font " << keyModifiersPath << std::endl;
     exit(1);
   }
-  indicatorFont = TTF_OpenFont(fontPath.c_str(), 12 * zoom);
+  indicatorFont = TTF_OpenFont(indicatorPath.c_str(), 12 * zoom);
   if (!indicatorFont) {
-    std::cout << "Couldn't load font " << fontPath << std::endl;
+    std::cout << "Couldn't load font " << indicatorPath << std::endl;
     exit(1);
-  }
-
-  {
-    std::string path = configPath();
-    if (!path.empty()) {
-      Config cfg(path);
-      Theme::load(cfg);
-      if (cfg.getBool("help_shown", false)) {
-        mode = GUI::DEBUG;
-      }
-    } else {
-      Config cfg("");
-      Theme::load(cfg);
-    }
   }
 
   gui.startPrompt(0, "Loading...");
