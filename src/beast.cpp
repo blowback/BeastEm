@@ -691,7 +691,25 @@ void Beast::debugMenu(SDL_Event windowEvent) {
       selection = (selection == SEL_A) ? SEL_A2 : SEL_A;
     }
     break;
+  case SDLK_i:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_IX) ? SEL_IY : SEL_IX;
+    }
+    break;
+  case SDLK_KP_8: selection = SEL_MEM0; break;
+  case SDLK_KP_7: memView[0] = nextView(memView[0], -1); break;
+  case SDLK_KP_9: memView[0] = nextView(memView[0],  1); break;
+  case SDLK_KP_5: selection = SEL_MEM1; break;
+  case SDLK_KP_4: memView[1] = nextView(memView[1], -1); break;
+  case SDLK_KP_6: memView[1] = nextView(memView[1],  1); break;
+  case SDLK_KP_2: selection = SEL_MEM2; break;
+  case SDLK_KP_1: memView[2] = nextView(memView[2], -1); break;
+  case SDLK_KP_3: memView[2] = nextView(memView[2],  1); break;
   case SDLK_b:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_BC) ? SEL_BC2 : SEL_BC;
+      break;
+    }
     mode = GUI::BREAKPOINTS;
     breakpointGui->resetMode(false);
     breakpointGui->setAddresses(
@@ -716,6 +734,10 @@ void Beast::debugMenu(SDL_Event windowEvent) {
     selection = 0;
     break;
   case SDLK_c:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_BC) ? SEL_BC2 : SEL_BC;
+      break;
+    }
     if (debugManager->addBreakpoint(currentInstructionPC, false)) {
       mode = GUI::BREAKPOINTS;
       breakpointGui->resetMode(true);
@@ -737,6 +759,10 @@ void Beast::debugMenu(SDL_Event windowEvent) {
     }
     break;
   case SDLK_p:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = SEL_PC;
+      break;
+    }
     pageMap.toggle();
     break;
   case SDLK_q:
@@ -748,8 +774,16 @@ void Beast::debugMenu(SDL_Event windowEvent) {
     stopReason = STOP_NONE;
     break;
   case SDLK_e:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_DE) ? SEL_DE2 : SEL_DE;
+      break;
+    }
     reset(); // Fall through into step
   case SDLK_s:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = SEL_SP;
+      break;
+    }
     mode = GUI::STEP;
     stopReason = STOP_STEP;
     break;
@@ -766,6 +800,10 @@ void Beast::debugMenu(SDL_Event windowEvent) {
     selection = 0;
     break;
   case SDLK_l:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_HL) ? SEL_HL2 : SEL_HL;
+      break;
+    }
     if (listMode == LM_CPU) {
       listMode = LM_ADDRESS;
       selection = SEL_LISTING;
@@ -774,6 +812,10 @@ void Beast::debugMenu(SDL_Event windowEvent) {
     }
     break;
   case SDLK_h:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_HL) ? SEL_HL2 : SEL_HL;
+      break;
+    }
     if (historyCount > 1) {
       if (listMode != LM_HISTORY) {
         listMode = LM_HISTORY;
@@ -788,6 +830,10 @@ void Beast::debugMenu(SDL_Event windowEvent) {
     }
     break;
   case SDLK_d:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_DE) ? SEL_DE2 : SEL_DE;
+      break;
+    }
     uart_connect(&uart, false);
     break;
 
