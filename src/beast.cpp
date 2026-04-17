@@ -1215,7 +1215,7 @@ void Beast::updateSelection(int direction, int maxSelection) {
 
 void Beast::tabSelection(int direction) {
   static const Selection tabStops[] = {
-    SEL_PC, SEL_FLAGS, SEL_PAGING, SEL_A2,
+    SEL_PC, SEL_FLAGS, SEL_PAGING, SEL_A2, SEL_INTERRUPT,
     SEL_MEM0, SEL_MEM1, SEL_MEM2, SEL_VOLUME
   };
   static const int numStops = sizeof(tabStops) / sizeof(tabStops[0]);
