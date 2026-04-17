@@ -239,6 +239,7 @@ class Beast {
         VideoView nextVideoView(VideoView view, int dir);
 
         void updateSelection(int direction, int maxSelection);
+        void tabSelection(int direction);
         void itemSelect(int direction);
         void startMemoryEdit(int view);
         void updateMemoryEdit(int delta, bool startEdit);
