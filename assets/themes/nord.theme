@@ -1,0 +1,50 @@
+# Nord — https://www.nordtheme.com/
+# Shipped theme. Select with `active_theme = nord` in beastem.conf.
+# To customise, copy these entries into a [theme.<name>] section in beastem.conf.
+
+color.text                = #E5E9F0
+color.menu                = #88C0D0
+color.bright              = #A3BE8C
+color.dim                 = #4C566A
+color.very_dim            = #434C5E
+color.disabled            = #4C566A
+color.disassembly         = #B48EAD
+color.current_pc          = #BF616A
+color.yellow              = #EBCB8B
+color.key_ink             = #2E3440
+
+color.key_cap             = #E5E9F0
+color.keyboard_bg         = #3B4252
+color.key_pressed         = #5E81AC
+
+color.breakpoint_enabled  = #BF616A
+color.breakpoint_disabled = #BF616A64
+color.trace_enabled       = #B48EAD
+color.trace_disabled      = #B48EAD64
+color.watchpoint          = #8FBCBB
+color.indicator_text      = #ECEFF4
+
+color.dialog_bg           = #3B4252E8
+color.pagemap_bg          = #2E3440
+color.screen_bg           = #2E3440
+
+color.edit_bg             = #434C5E
+color.edit_ink            = #ECEFF4
+color.edit_highlight      = #BF616A
+color.prompt_bg           = #3B4252
+
+color.digit_bg            = #2E3440
+color.digit_on            = #88C0D0
+
+color.page_addr           = #D8DEE9
+color.page_dark_text      = #2E3440
+color.page_light_text     = #ECEFF4
+color.page_border         = #4C566A
+color.page_cpm            = #5E81AC
+color.page_ramdisk        = #8FBCBB
+color.page_free           = #D8DEE9
+color.page_restore        = #BF616A
+color.page_romdisk        = #B48EAD
+color.page_boot           = #EBCB8B
+color.page_vconsole       = #88C0D0
+color.page_videobeast     = #D08770
