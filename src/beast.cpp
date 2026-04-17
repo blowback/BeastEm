@@ -686,6 +686,11 @@ void Beast::debugMenu(SDL_Event windowEvent) {
   case SDLK_PERIOD:
     itemEdit(true);
     break;
+  case SDLK_a:
+    if (SDL_GetModState() & KMOD_CTRL) {
+      selection = (selection == SEL_A) ? SEL_A2 : SEL_A;
+    }
+    break;
   case SDLK_b:
     mode = GUI::BREAKPOINTS;
     breakpointGui->resetMode(false);
