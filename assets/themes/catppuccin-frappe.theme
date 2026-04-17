@@ -1,0 +1,49 @@
+# Catppuccin Frappé — https://github.com/catppuccin/catppuccin
+# Shipped theme. Select with `active_theme = catppuccin-frappe` in beastem.conf.
+
+color.text                = #C6D0F5
+color.menu                = #8CAAEE
+color.bright              = #A6D189
+color.dim                 = #838BA7
+color.very_dim            = #626880
+color.disabled            = #737994
+color.disassembly         = #CA9EE6
+color.current_pc          = #E78284
+color.yellow              = #E5C890
+color.key_ink             = #303446
+
+color.key_cap             = #C6D0F5
+color.keyboard_bg         = #292C3C
+color.key_pressed         = #8CAAEE
+
+color.breakpoint_enabled  = #E78284
+color.breakpoint_disabled = #E7828464
+color.trace_enabled       = #CA9EE6
+color.trace_disabled      = #CA9EE664
+color.watchpoint          = #81C8BE
+color.indicator_text      = #303446
+
+color.dialog_bg           = #292C3CE8
+color.pagemap_bg          = #303446
+color.screen_bg           = #232634
+
+color.edit_bg             = #414559
+color.edit_ink            = #C6D0F5
+color.edit_highlight      = #E78284
+color.prompt_bg           = #292C3C
+
+color.digit_bg            = #232634
+color.digit_on            = #8CAAEE
+
+color.page_addr           = #A5ADCE
+color.page_dark_text      = #232634
+color.page_light_text     = #C6D0F5
+color.page_border         = #626880
+color.page_cpm            = #8CAAEE
+color.page_ramdisk        = #81C8BE
+color.page_free           = #A5ADCE
+color.page_restore        = #E78284
+color.page_romdisk        = #CA9EE6
+color.page_boot           = #E5C890
+color.page_vconsole       = #85C1DC
+color.page_videobeast     = #EF9F76

@@ -1,0 +1,49 @@
+# Catppuccin Latte — https://github.com/catppuccin/catppuccin
+# Shipped theme. Select with `active_theme = catppuccin-latte` in beastem.conf.
+
+color.text                = #4C4F69
+color.menu                = #1E66F5
+color.bright              = #40A02B
+color.dim                 = #8C8FA1
+color.very_dim            = #ACB0BE
+color.disabled            = #9CA0B0
+color.disassembly         = #8839EF
+color.current_pc          = #D20F39
+color.yellow              = #DF8E1D
+color.key_ink             = #EFF1F5
+
+color.key_cap             = #4C4F69
+color.keyboard_bg         = #E6E9EF
+color.key_pressed         = #1E66F5
+
+color.breakpoint_enabled  = #D20F39
+color.breakpoint_disabled = #D20F3964
+color.trace_enabled       = #8839EF
+color.trace_disabled      = #8839EF64
+color.watchpoint          = #179299
+color.indicator_text      = #EFF1F5
+
+color.dialog_bg           = #EFF1F5E8
+color.pagemap_bg          = #EFF1F5
+color.screen_bg           = #DCE0E8
+
+color.edit_bg             = #FFFFFF
+color.edit_ink            = #4C4F69
+color.edit_highlight      = #D20F39
+color.prompt_bg           = #E6E9EF
+
+color.digit_bg            = #11111B
+color.digit_on            = #04A5E5
+
+color.page_addr           = #6C6F85
+color.page_dark_text      = #4C4F69
+color.page_light_text     = #EFF1F5
+color.page_border         = #9CA0B0
+color.page_cpm            = #1E66F5
+color.page_ramdisk        = #209FB5
+color.page_free           = #CCD0DA
+color.page_restore        = #D20F39
+color.page_romdisk        = #8839EF
+color.page_boot           = #DC8A78
+color.page_vconsole       = #1E66F5
+color.page_videobeast     = #FE640B

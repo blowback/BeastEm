@@ -1,0 +1,49 @@
+# Catppuccin Mocha — https://github.com/catppuccin/catppuccin
+# Shipped theme. Select with `active_theme = catppuccin-mocha` in beastem.conf.
+
+color.text                = #CDD6F4
+color.menu                = #89B4FA
+color.bright              = #A6E3A1
+color.dim                 = #7F849C
+color.very_dim            = #585B70
+color.disabled            = #6C7086
+color.disassembly         = #CBA6F7
+color.current_pc          = #F38BA8
+color.yellow              = #F9E2AF
+color.key_ink             = #1E1E2E
+
+color.key_cap             = #CDD6F4
+color.keyboard_bg         = #181825
+color.key_pressed         = #89B4FA
+
+color.breakpoint_enabled  = #F38BA8
+color.breakpoint_disabled = #F38BA864
+color.trace_enabled       = #CBA6F7
+color.trace_disabled      = #CBA6F764
+color.watchpoint          = #94E2D5
+color.indicator_text      = #1E1E2E
+
+color.dialog_bg           = #181825E8
+color.pagemap_bg          = #1E1E2E
+color.screen_bg           = #11111B
+
+color.edit_bg             = #313244
+color.edit_ink            = #CDD6F4
+color.edit_highlight      = #F38BA8
+color.prompt_bg           = #181825
+
+color.digit_bg            = #11111B
+color.digit_on            = #89B4FA
+
+color.page_addr           = #A6ADC8
+color.page_dark_text      = #11111B
+color.page_light_text     = #CDD6F4
+color.page_border         = #585B70
+color.page_cpm            = #89B4FA
+color.page_ramdisk        = #94E2D5
+color.page_free           = #A6ADC8
+color.page_restore        = #F38BA8
+color.page_romdisk        = #CBA6F7
+color.page_boot           = #F9E2AF
+color.page_vconsole       = #74C7EC
+color.page_videobeast     = #FAB387
