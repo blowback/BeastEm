@@ -276,6 +276,8 @@ class GUI {
         TTF_Font *memAddrFont;
         TTF_Font *memHexFont;
         TTF_Font *memCharsFont;
+        TTF_Font *keyhintKeyFont;
+        TTF_Font *keyhintHintFont;
 
         uint32_t   editValue, editOldValue;
 
