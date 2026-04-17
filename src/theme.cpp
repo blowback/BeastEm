@@ -187,6 +187,8 @@ void Theme::load(Config &config) {
     t.font_ui_mem_address   = src.getStr("font.ui.mem.address",   "RobotoMono-VariableFont_wght.ttf", dirty);
     t.font_ui_mem_hex       = src.getStr("font.ui.mem.hex",       "RobotoMono-VariableFont_wght.ttf", dirty);
     t.font_ui_mem_chars     = src.getStr("font.ui.mem.chars",     "RobotoMono-VariableFont_wght.ttf", dirty);
+    t.font_ui_keyhint_key   = src.getStr("font.ui.keyhint.key",   "RobotoMono-VariableFont_wght.ttf", dirty);
+    t.font_ui_keyhint_hint  = src.getStr("font.ui.keyhint.hint",  "RobotoMono-VariableFont_wght.ttf", dirty);
     t.font_key_caps         = src.getStr("font.key.caps",         "Roboto-Medium.ttf", dirty);
     t.font_key_narrow       = src.getStr("font.key.narrow",       "Roboto-Medium.ttf", dirty);
     t.font_key_modifiers    = src.getStr("font.key.modifiers",    "Roboto-Medium.ttf", dirty);

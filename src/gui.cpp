@@ -22,11 +22,13 @@ void GUI::init(float zoom) {
         exit(1);
     }
 
-    memAddrFont  = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_address).c_str(), MONO_SIZE*zoom);
-    memHexFont   = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_hex).c_str(),     MONO_SIZE*zoom);
-    memCharsFont = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_chars).c_str(),   MONO_SIZE*zoom);
-    if (!memAddrFont || !memHexFont || !memCharsFont) {
-        std::cout << "Couldn't load memory-viewer fonts" << std::endl;
+    memAddrFont      = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_address).c_str(),  MONO_SIZE*zoom);
+    memHexFont       = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_hex).c_str(),      MONO_SIZE*zoom);
+    memCharsFont     = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_chars).c_str(),    MONO_SIZE*zoom);
+    keyhintKeyFont   = TTF_OpenFont(::fontPath(Theme::instance().font_ui_keyhint_key).c_str(),  MONO_SIZE*zoom);
+    keyhintHintFont  = TTF_OpenFont(::fontPath(Theme::instance().font_ui_keyhint_hint).c_str(), MONO_SIZE*zoom);
+    if (!memAddrFont || !memHexFont || !memCharsFont || !keyhintKeyFont || !keyhintHintFont) {
+        std::cout << "Couldn't load memory-viewer / keyhint fonts" << std::endl;
         exit(1);
     }
 
@@ -642,17 +644,21 @@ int GUI::printKeyHintB(int x, int y, SDL_Color color, int highlight, SDL_Color b
 
     char *colon = strchr(buffer, ':');
     if (!colon || colon == buffer) {
-        return printb(x, y, hintColor, highlight, background, buffer);
+        return printfb(keyhintHintFont, x, y, hintColor, highlight, background, buffer);
     }
     int keyLen = (int)(colon - buffer);
-    int keyWidth = getWidthFor(keyLen);
 
-    SDL_Color keyTextColor = Theme::instance().key_ink;
+    // Measure the key portion with its own font so the hint portion starts at the right x.
     char savedChar = buffer[keyLen];
     buffer[keyLen] = '\0';
-    printb(x, y, keyTextColor, keyLen, hintColor, buffer);
+    int keyWidthPx, hPx;
+    TTF_SizeUTF8(keyhintKeyFont, buffer, &keyWidthPx, &hPx);
+    int keyWidth = (int)(keyWidthPx / zoom);
+
+    SDL_Color keyTextColor = Theme::instance().key_ink;
+    printfb(keyhintKeyFont, x, y, keyTextColor, keyLen, hintColor, buffer);
     buffer[keyLen] = savedChar;
 
-    int restWidth = printb(x + keyWidth, y, hintColor, highlight, background, buffer + keyLen);
+    int restWidth = printfb(keyhintHintFont, x + keyWidth, y, hintColor, highlight, background, buffer + keyLen);
     return keyWidth + restWidth;
 }

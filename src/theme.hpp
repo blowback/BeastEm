@@ -14,6 +14,8 @@ struct Theme {
     std::string font_ui_mem_address;    // memory viewer: "0x####" address column
     std::string font_ui_mem_hex;        // memory viewer: hex byte dump
     std::string font_ui_mem_chars;      // memory viewer: ASCII character dump
+    std::string font_ui_keyhint_key;    // keyhint: the key (left of ":")
+    std::string font_ui_keyhint_hint;   // keyhint: the hint (right of ":")
     std::string font_key_caps;          // main label on virtual keyboard keys
     std::string font_key_narrow;        // narrow keys (Shift, Ctrl, …)
     std::string font_key_modifiers;     // secondary labels (Shift+X / Ctrl+X)
