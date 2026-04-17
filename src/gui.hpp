@@ -206,6 +206,30 @@ class GUI {
             return 0;
         }
 
+        /* Memory viewer: address, hex dump, and ASCII chars — each with their own font slot */
+        template<typename... Args> int printMemAddress(int x, int y, SDL_Color color, const char *fmt, Args... args) {
+            char buffer[200];
+            int c = snprintf(buffer, sizeof(buffer), fmt, args...);
+            if( c > 0 && c<(int)sizeof(buffer)) return printfb(memAddrFont, x, y, color, 0, {0}, buffer);
+            return 0;
+        }
+        template<typename... Args> int printMemHex(int x, int y, SDL_Color color, const char *fmt, Args... args) {
+            char buffer[200];
+            int c = snprintf(buffer, sizeof(buffer), fmt, args...);
+            if( c > 0 && c<(int)sizeof(buffer)) return printfb(memHexFont, x, y, color, 0, {0}, buffer);
+            return 0;
+        }
+        template<typename... Args> int printMemChars(int x, int y, SDL_Color color, const char *fmt, Args... args) {
+            char buffer[200];
+            int c = snprintf(buffer, sizeof(buffer), fmt, args...);
+            if( c > 0 && c<(int)sizeof(buffer)) return printfb(memCharsFont, x, y, color, 0, {0}, buffer);
+            return 0;
+        }
+        /* Pixel width that the given memory-view chunk would render at. */
+        int memAddressWidth(const char *text);
+        int memHexWidth(const char *text);
+        int memCharsWidth(const char *text);
+
         template<typename... Args> void startPrompt(int id, const char *fmt, Args... args) {
             promptId = id;
             int c;
@@ -249,6 +273,9 @@ class GUI {
 
         TTF_Font *monoFont;
         TTF_Font *labelFont;
+        TTF_Font *memAddrFont;
+        TTF_Font *memHexFont;
+        TTF_Font *memCharsFont;
 
         uint32_t   editValue, editOldValue;
 
@@ -294,5 +321,8 @@ class GUI {
 
         /* Print a buffer using the label font */
         int       printlb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
+
+        /* Generic: render using the given font */
+        int       printfb(TTF_Font *font, int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer);
 
 };

@@ -2818,46 +2818,40 @@ void Beast::displayVideoMem(int x, int y, SDL_Color textColor, VideoView view,
 void Beast::displayMem(int x, int y, SDL_Color textColor, uint16_t markAddress,
                        int page) {
   uint16_t address = (markAddress & 0xFFF0) - 16;
-
   uint16_t addressMask = page < 0 ? 0xFFFF : 0x3FFF;
 
-  const int BUFFER_SIZE = 200;
-  char buffer[BUFFER_SIZE];
+  char addrBuf[16];
+  char hexBuf[64];
+  char charsBuf[32];
+
   for (int row = 0; row < 3; row++) {
-    int c = snprintf(buffer, BUFFER_SIZE, " 0x%04X ", address & addressMask);
-    if (c < 0 || c >= BUFFER_SIZE) {
-      break;
-    }
+    int rowY = y + (GUI::MEM_ROW_HEIGHT * row);
+
+    snprintf(addrBuf, sizeof(addrBuf), " 0x%04X ", address & addressMask);
+
+    int hc = 0;
     for (uint16_t i = 0; i < 16; i++) {
       uint8_t data =
           page < 0 ? readMem(address + i) : readPage(page, address + i);
+      hc += snprintf(hexBuf + hc, sizeof(hexBuf) - hc,
+                     (address + i == markAddress) ? ">%02X" : " %02X", data);
+    }
+    hc += snprintf(hexBuf + hc, sizeof(hexBuf) - hc, "   ");
 
-      int cs = snprintf(buffer + c, BUFFER_SIZE - c,
-                        (address + i == markAddress) ? ">%02X" : " %02X", data);
-      if (cs < 0 || cs + c >= BUFFER_SIZE) {
-        return;
-      }
-      c += cs;
-    }
-    int cn = snprintf(buffer + c, BUFFER_SIZE - c, "   ");
-    if (cn < 0 || cn + c >= BUFFER_SIZE) {
-      return;
-    }
-    c += cn;
+    int cc = 0;
     for (int i = 0; i < 16; i++) {
       uint8_t data =
           page < 0 ? readMem(address + i) : readPage(page, address + i);
-      if (data < 32 || data > 127) {
-        data = '.';
-      }
-
-      buffer[c++] = data;
-      buffer[c] = 0;
-      if (c + 1 >= BUFFER_SIZE) {
-        return;
-      }
+      if (data < 32 || data > 127) data = '.';
+      charsBuf[cc++] = (char)data;
     }
-    gui.print(x, y + (GUI::MEM_ROW_HEIGHT * row), textColor, buffer);
+    charsBuf[cc] = 0;
+
+    int xCur = x;
+    xCur += gui.printMemAddress(xCur, rowY, textColor, "%s", addrBuf);
+    xCur += gui.printMemHex(xCur, rowY, textColor, "%s", hexBuf);
+    gui.printMemChars(xCur, rowY, textColor, "%s", charsBuf);
+
     address += 16;
   }
 }

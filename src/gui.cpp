@@ -22,6 +22,14 @@ void GUI::init(float zoom) {
         exit(1);
     }
 
+    memAddrFont  = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_address).c_str(), MONO_SIZE*zoom);
+    memHexFont   = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_hex).c_str(),     MONO_SIZE*zoom);
+    memCharsFont = TTF_OpenFont(::fontPath(Theme::instance().font_ui_mem_chars).c_str(),   MONO_SIZE*zoom);
+    if (!memAddrFont || !memHexFont || !memCharsFont) {
+        std::cout << "Couldn't load memory-viewer fonts" << std::endl;
+        exit(1);
+    }
+
     char padding[2] = {'0', 0};
     TTF_SizeUTF8(monoFont, padding, &charWidth, &charHeight);
 }
@@ -550,6 +558,48 @@ int GUI::printb(int x, int y, SDL_Color color, int highlight, SDL_Color backgrou
 int GUI::getWidthFor(int characters) {
     return charWidth * characters / zoom;
 }
+
+int GUI::printfb(TTF_Font *font, int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
+    SDL_Surface *textSurface = TTF_RenderText_Blended(font, buffer, color);
+    SDL_Texture *textTexture = SDL_CreateTextureFromSurface(sdlRenderer, textSurface);
+
+    if (highlight != 0) {
+        int width;
+        int height;
+        if (highlight > 0) {
+            buffer[highlight] = (char)0;
+            TTF_SizeUTF8(font, buffer, &width, &height);
+            boxRGBA(sdlRenderer, x*zoom, (y+1)*zoom, x*zoom+width, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
+        } else {
+            buffer += strlen(buffer)+highlight;
+            TTF_SizeUTF8(font, buffer, &width, &height);
+            boxRGBA(sdlRenderer, x*zoom+textSurface->w-width, (y+1)*zoom, x*zoom+textSurface->w, (y-2)*zoom+height, background.r, background.g, background.b, 0xFF);
+        }
+    }
+
+    SDL_Rect textRect;
+    textRect.x = x*zoom;
+    textRect.y = y*zoom;
+    textRect.w = textSurface->w;
+    textRect.h = textSurface->h;
+
+    int effectiveWidth = textSurface->w/zoom;
+    SDL_RenderCopy(sdlRenderer, textTexture, NULL, &textRect);
+
+    SDL_DestroyTexture(textTexture);
+    SDL_FreeSurface(textSurface);
+    return effectiveWidth;
+}
+
+static int sizeInGuiUnits(TTF_Font *font, const char *text, float zoom) {
+    int w, h;
+    TTF_SizeUTF8(font, text, &w, &h);
+    return (int)(w / zoom);
+}
+
+int GUI::memAddressWidth(const char *text) { return sizeInGuiUnits(memAddrFont, text, zoom); }
+int GUI::memHexWidth(const char *text)     { return sizeInGuiUnits(memHexFont, text, zoom); }
+int GUI::memCharsWidth(const char *text)   { return sizeInGuiUnits(memCharsFont, text, zoom); }
 
 int GUI::printlb(int x, int y, SDL_Color color, int highlight, SDL_Color background, char* buffer) {
     SDL_Surface *textSurface = TTF_RenderText_Blended(labelFont, buffer, color);

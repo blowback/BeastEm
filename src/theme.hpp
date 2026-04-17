@@ -11,6 +11,9 @@ struct Theme {
     std::string font_ui;                // the whole debug GUI (monospace)
     std::string font_ui_labels;         // register / column / port labels in the debug view
     std::string font_ui_indicators;     // breakpoint / watchpoint number badges
+    std::string font_ui_mem_address;    // memory viewer: "0x####" address column
+    std::string font_ui_mem_hex;        // memory viewer: hex byte dump
+    std::string font_ui_mem_chars;      // memory viewer: ASCII character dump
     std::string font_key_caps;          // main label on virtual keyboard keys
     std::string font_key_narrow;        // narrow keys (Shift, Ctrl, …)
     std::string font_key_modifiers;     // secondary labels (Shift+X / Ctrl+X)
