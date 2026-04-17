@@ -498,7 +498,7 @@ void PageMap::draw(const uint8_t memoryPage[4], bool pagingEnabled, bool videoBe
 
     // Legend centred at the bottom - same font/size/colour as main debug screen hints
     {
-        const char* legend = "[ESC]: Close";
+        const char* legend = "ESC: Close";
         int tw, th;
         TTF_SizeUTF8(monoFont, legend, &tw, &th);
         print(monoFont, (WIDTH - tw) / 2, HEIGHT - 24, menuColor, "%s", legend);

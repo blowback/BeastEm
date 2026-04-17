@@ -5,5 +5,5 @@
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
 add_test(DebugManagerTests "/home/ant/src/microbeast/beastem_blowback_github/test_debugmanager")
-set_tests_properties(DebugManagerTests PROPERTIES  _BACKTRACE_TRIPLES "/home/ant/src/microbeast/beastem_blowback_github/CMakeLists.txt;102;add_test;/home/ant/src/microbeast/beastem_blowback_github/CMakeLists.txt;0;")
+set_tests_properties(DebugManagerTests PROPERTIES  _BACKTRACE_TRIPLES "/home/ant/src/microbeast/beastem_blowback_github/CMakeLists.txt;103;add_test;/home/ant/src/microbeast/beastem_blowback_github/CMakeLists.txt;0;")
 subdirs("deps/nativefiledialog-extended-1.1.1")

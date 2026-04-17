@@ -232,8 +232,8 @@ void BreakpointGui::drawBreakpoints() {
 
   // Title and navigation hint
   gui->print(GUI::COL1, 34, menuColor, "BREAKPOINTS");
-  gui->print(GUI::COL4, 34, menuColor, "[W]atchpoints");
-  gui->print(GUI::COL5, 34, menuColor, "Trace lo[G]");
+  gui->print(GUI::COL4, 34, menuColor, "W: Watchpoints");
+  gui->print(GUI::COL5, 34, menuColor, "G: Trace log");
 
   // Column headers - aligned with data columns
   gui->print(GUI::COL1, GUI::ROW2, textColor, " #    Address  Status");
@@ -280,18 +280,18 @@ void BreakpointGui::drawBreakpoints() {
   if (bpCount >= DebugManager::MAX_BREAKPOINTS) {
     gui->print(GUI::COL1, GUI::END_ROW, menuColor, "Full");
   } else {
-    gui->print(GUI::COL1, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "[A]dd");
-    gui->print(GUI::COL2, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "[C]pu.pc 0x%04X", cpuAddress);
+    gui->print(GUI::COL1, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "A: Add");
+    gui->print(GUI::COL2, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "C: Cpu.pc 0x%04X", cpuAddress);
     if (listingAddress != cpuAddress) {
-      gui->print(GUI::COL3, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "[Y]:Listing 0x%04X", listingAddress);
+      gui->print(GUI::COL3, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "Y: Listing 0x%04X", listingAddress);
     }
-    gui->print(GUI::COL5, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "BDO[S]");
+    gui->print(GUI::COL5, GUI::END_ROW - GUI::ROW_HEIGHT*2, menuColor, "S: BDOS");
   }
-  gui->print(GUI::COL1, GUI::END_ROW, menuColor, "[Space]:Toggle");
-  gui->print(GUI::COL2, GUI::END_ROW, menuColor, "[Enter]:Edit");
-  gui->print(GUI::COL3, GUI::END_ROW, menuColor, "[N]ame");
-  gui->print(GUI::COL4, GUI::END_ROW, menuColor, "[D]elete");
-  gui->print(GUI::COL5, GUI::END_ROW, menuColor, "[ESC]:Exit");
+  gui->print(GUI::COL1, GUI::END_ROW, menuColor, "Space: Toggle");
+  gui->print(GUI::COL2, GUI::END_ROW, menuColor, "Enter: Edit");
+  gui->print(GUI::COL3, GUI::END_ROW, menuColor, "N: Name");
+  gui->print(GUI::COL4, GUI::END_ROW, menuColor, "D: Delete");
+  gui->print(GUI::COL5, GUI::END_ROW, menuColor, "ESC: Exit");
 }
 
 void BreakpointGui::drawWatchpoints() {
@@ -307,8 +307,8 @@ void BreakpointGui::drawWatchpoints() {
 
   // Title and navigation hint
   gui->print(GUI::COL1, 34, menuColor, "WATCHPOINTS");
-  gui->print(GUI::COL4, 34, menuColor, "[B]reakpoints");
-  gui->print(GUI::COL5, 34, menuColor, "Trace lo[G]");
+  gui->print(GUI::COL4, 34, menuColor, "B: Breakpoints");
+  gui->print(GUI::COL5, 34, menuColor, "G: Trace log");
 
   // Column headers - aligned with data columns
   gui->print(GUI::COL1, GUI::ROW2, textColor,
@@ -389,12 +389,12 @@ void BreakpointGui::drawWatchpoints() {
   if (wpCount >= DebugManager::MAX_WATCHPOINTS && !watchpointEditMode) {
     gui->print(GUI::COL1, GUI::END_ROW, menuColor, "Full");
   } else {
-    gui->print(GUI::COL1, GUI::END_ROW, menuColor, "[A]dd");
+    gui->print(GUI::COL1, GUI::END_ROW, menuColor, "A: Add");
   }
-  gui->print(GUI::COL2 - gui->getWidthFor(5), GUI::END_ROW, menuColor, "[D]elete");
-  gui->print(GUI::COL3 - gui->getWidthFor(5), GUI::END_ROW, menuColor, "[Space]:Toggle");
-  gui->print(GUI::COL4, GUI::END_ROW, menuColor, "[Enter]:Edit");
-  gui->print(GUI::COL5, GUI::END_ROW, menuColor, "[ESC]:Exit");
+  gui->print(GUI::COL2 - gui->getWidthFor(5), GUI::END_ROW, menuColor, "D: Delete");
+  gui->print(GUI::COL3 - gui->getWidthFor(5), GUI::END_ROW, menuColor, "Space: Toggle");
+  gui->print(GUI::COL4, GUI::END_ROW, menuColor, "Enter: Edit");
+  gui->print(GUI::COL5, GUI::END_ROW, menuColor, "ESC: Exit");
 }
 
 void BreakpointGui::resetMode(bool selectLast) {
@@ -652,8 +652,8 @@ void BreakpointGui::drawTraceLog() {
 
   // Title and navigation hint
   gui->print(GUI::COL1, 34, menuColor, "TRACELOG");
-  gui->print(GUI::COL4, 34, menuColor, "[B]reakpoints");
-  gui->print(GUI::COL5, 34, menuColor, "[W]atchpoints");
+  gui->print(GUI::COL4, 34, menuColor, "B: Breakpoints");
+  gui->print(GUI::COL5, 34, menuColor, "W: Watchpoints");
 
   std::deque<TraceLog>* logs = debugManager->getTraceLogs();
 
@@ -745,9 +745,9 @@ void BreakpointGui::drawTraceLog() {
       addSeparator(log.tick).c_str());
   }
 
-  gui->print(GUI::COL1, GUI::END_ROW, menuColor, "[C]lear");
-  gui->print(GUI::COL2, GUI::END_ROW, menuColor, "[R]elative");
-  gui->print(GUI::COL5, GUI::END_ROW, menuColor, "[ESC]:Exit");
+  gui->print(GUI::COL1, GUI::END_ROW, menuColor, "C: Clear");
+  gui->print(GUI::COL2, GUI::END_ROW, menuColor, "R: Relative");
+  gui->print(GUI::COL5, GUI::END_ROW, menuColor, "ESC: Exit");
 }
 
 std::string BreakpointGui::addSeparator(uint64_t value) {
