@@ -1,6 +1,7 @@
 #include "beast.hpp"
 #include "SDL_image.h"
 #include "assets.hpp"
+#include "config.hpp"
 #include "listing.hpp"
 #include "nfd.h"
 #include "z80.h"
@@ -12,6 +13,15 @@
 #include <iomanip>
 #include <iostream>
 #include <stdio.h>
+
+static std::string configPath() {
+  char *prefPath = SDL_GetPrefPath("Feersum", "BeastEm");
+  if (!prefPath)
+    return "";
+  std::string result = std::string(prefPath) + "beastem.conf";
+  SDL_free(prefPath);
+  return result;
+}
 
 Beast::Beast(SDL_Window *window, int screenWidth, int screenHeight, float zoom,
              Listing &listing, std::vector<BinaryFile> files)
@@ -30,7 +40,8 @@ Beast::Beast(SDL_Window *window, int screenWidth, int screenHeight, float zoom,
 
   instr = new Instructions();
   debugManager = new DebugManager();
-  breakpointGui = new BreakpointGui(sdlRenderer, screenWidth, screenHeight, this->zoom, &gui, debugManager);
+  breakpointGui = new BreakpointGui(sdlRenderer, screenWidth, screenHeight,
+                                    this->zoom, &gui, debugManager);
 
   i2c = new I2c(Z80PIO_PB6, Z80PIO_PB7);
   display1 = new I2cDisplay(0x50);
@@ -62,6 +73,16 @@ Beast::Beast(SDL_Window *window, int screenWidth, int screenHeight, float zoom,
   if (!indicatorFont) {
     std::cout << "Couldn't load font " << fontPath << std::endl;
     exit(1);
+  }
+
+  {
+    std::string path = configPath();
+    if (!path.empty()) {
+      Config cfg(path);
+      if (cfg.getBool("help_shown", false)) {
+        mode = GUI::DEBUG;
+      }
+    }
   }
 
   gui.startPrompt(0, "Loading...");
@@ -389,7 +410,7 @@ void Beast::mainLoop() {
       uint64_t end_time = SDL_GetPerformanceCounter();
       double duration =
           ((double)(end_time - start_time)) / SDL_GetPerformanceFrequency();
-      double mhz = ((double)(tickCount-startTime)) / 1000000 / duration;
+      double mhz = ((double)(tickCount - startTime)) / 1000000 / duration;
 
       listMode = LM_CPU;
       std::cout << "Speed " << mhz << " Mhz" << std::endl;
@@ -437,7 +458,8 @@ void Beast::mainLoop() {
 
         do {
           run(false);
-        } while (!z80_opdone(&cpu) || (cpu.pc != breakPoint && mode == GUI::OVER));
+        } while (!z80_opdone(&cpu) ||
+                 (cpu.pc != breakPoint && mode == GUI::OVER));
       }
       mode = GUI::DEBUG;
     } else if (mode == GUI::TAKE) {
@@ -452,8 +474,9 @@ void Beast::mainLoop() {
       mode = GUI::DEBUG;
     }
 
-    if ((mode == GUI::DEBUG) || (mode == GUI::FILES) || (mode == GUI::BREAKPOINTS) ||
-        (mode == GUI::WATCHPOINTS) || (mode == GUI::TRACELOG) || (mode == GUI::HELP)) {
+    if ((mode == GUI::DEBUG) || (mode == GUI::FILES) ||
+        (mode == GUI::BREAKPOINTS) || (mode == GUI::WATCHPOINTS) ||
+        (mode == GUI::TRACELOG) || (mode == GUI::HELP)) {
       drawBeast();
 
       if (mode == GUI::DEBUG) {
@@ -530,9 +553,8 @@ void Beast::mainLoop() {
           if (mode == GUI::BREAKPOINTS) {
             breakpointGui->breakpointTextEvent();
           }
-        }
-        else {
-          if(windowEvent.text.text[0] == '?') {
+        } else {
+          if (windowEvent.text.text[0] == '?') {
             mode = GUI::HELP;
           }
         }
@@ -578,7 +600,16 @@ void Beast::mainLoop() {
         } else if (mode == GUI::FILES) {
           fileMenu(windowEvent);
         } else if (mode == GUI::HELP) {
-          mode = HelpGui::helpMenu(windowEvent, mode);
+          GUI::Mode next = HelpGui::helpMenu(windowEvent, mode);
+          if (next != GUI::HELP) {
+            std::string path = configPath();
+            if (!path.empty()) {
+              Config cfg(path);
+              cfg.setBool("help_shown", true);
+              cfg.save();
+            }
+          }
+          mode = next;
           if (mode == GUI::RUN) {
             pageMap.close();
             stopReason = STOP_NONE;
@@ -643,34 +674,45 @@ void Beast::debugMenu(SDL_Event windowEvent) {
   case SDLK_b:
     mode = GUI::BREAKPOINTS;
     breakpointGui->resetMode(false);
-    breakpointGui->setAddresses(currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc>>14] : 0, listMode == LM_CPU ? currentInstructionPC : listAddress);
+    breakpointGui->setAddresses(
+        currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc >> 14] : 0,
+        listMode == LM_CPU ? currentInstructionPC : listAddress);
     selection = 0;
     break;
   case SDLK_w:
     mode = GUI::WATCHPOINTS;
     breakpointGui->resetMode(false);
-    breakpointGui->setAddresses(currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc>>14] : 0, listMode == LM_CPU ? currentInstructionPC : listAddress);
+    breakpointGui->setAddresses(
+        currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc >> 14] : 0,
+        listMode == LM_CPU ? currentInstructionPC : listAddress);
     selection = 0;
     break;
   case SDLK_g:
     mode = GUI::TRACELOG;
     breakpointGui->resetMode(false);
-    breakpointGui->setAddresses(currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc>>14] : 0, listMode == LM_CPU ? currentInstructionPC : listAddress);
+    breakpointGui->setAddresses(
+        currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc >> 14] : 0,
+        listMode == LM_CPU ? currentInstructionPC : listAddress);
     selection = 0;
     break;
   case SDLK_c:
     if (debugManager->addBreakpoint(currentInstructionPC, false)) {
       mode = GUI::BREAKPOINTS;
       breakpointGui->resetMode(true);
-      breakpointGui->setAddresses(currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc>>14] : 0, listMode == LM_CPU ? currentInstructionPC : listAddress);
+      breakpointGui->setAddresses(
+          currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc >> 14] : 0,
+          listMode == LM_CPU ? currentInstructionPC : listAddress);
       selection = 0;
     }
     break;
   case SDLK_y:
-    if (debugManager->addBreakpoint(listMode == LM_CPU ? currentInstructionPC : listAddress, false)) {
+    if (debugManager->addBreakpoint(
+            listMode == LM_CPU ? currentInstructionPC : listAddress, false)) {
       mode = GUI::BREAKPOINTS;
       breakpointGui->resetMode(true);
-      breakpointGui->setAddresses(currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc>>14] : 0, listMode == LM_CPU ? currentInstructionPC : listAddress);
+      breakpointGui->setAddresses(
+          currentInstructionPC, pagingEnabled ? memoryPage[cpu.pc >> 14] : 0,
+          listMode == LM_CPU ? currentInstructionPC : listAddress);
       selection = 0;
     }
     break;
@@ -717,9 +759,10 @@ void Beast::debugMenu(SDL_Event windowEvent) {
         listMode = LM_HISTORY;
         historyOffset = 0;
         selection = SEL_LISTING;
-        listAddress = history[(historyIndex + HISTORY_SIZE - historyOffset-1) % HISTORY_SIZE];
-      }
-      else {
+        listAddress =
+            history[(historyIndex + HISTORY_SIZE - historyOffset - 1) %
+                    HISTORY_SIZE];
+      } else {
         listMode = LM_CPU;
       }
     }
@@ -740,52 +783,51 @@ void Beast::debugMenu(SDL_Event windowEvent) {
 }
 
 void Beast::navigateList(int direction) {
-    selection = SEL_LISTING;
-    if (listMode == LM_CPU) {
-      listMode = LM_ADDRESS;
-      listAddress = (cpu.pc - 1) & 0x0FFFF;
-    }
-    if( listMode == LM_ADDRESS ) {
-      if (currentLoc.valid) {
-        std::pair<Listing::Line, bool> currentLine = listing.getLine(currentLoc);
-        Listing::Location newLoc = currentLoc;
-        if (direction>0) {
-          while(true) {
-            std::pair<Listing::Line, bool> newLine = listing.getLine(newLoc);
-            if (newLine.second) {
-              if (newLine.first.address > currentLine.first.address) {
-                listAddress = newLine.first.address;
-                break;
-              }
-            } else {
-              break;
-            }
-            newLoc.lineNum++;
-          }
-        }
-        else {
-          while (newLoc.lineNum-->0) {
-            std::pair<Listing::Line, bool> newLine = listing.getLine(newLoc);
-            if (newLine.second && newLine.first.address < currentLine.first.address) {
+  selection = SEL_LISTING;
+  if (listMode == LM_CPU) {
+    listMode = LM_ADDRESS;
+    listAddress = (cpu.pc - 1) & 0x0FFFF;
+  }
+  if (listMode == LM_ADDRESS) {
+    if (currentLoc.valid) {
+      std::pair<Listing::Line, bool> currentLine = listing.getLine(currentLoc);
+      Listing::Location newLoc = currentLoc;
+      if (direction > 0) {
+        while (true) {
+          std::pair<Listing::Line, bool> newLine = listing.getLine(newLoc);
+          if (newLine.second) {
+            if (newLine.first.address > currentLine.first.address) {
               listAddress = newLine.first.address;
               break;
-            } 
+            }
+          } else {
+            break;
+          }
+          newLoc.lineNum++;
+        }
+      } else {
+        while (newLoc.lineNum-- > 0) {
+          std::pair<Listing::Line, bool> newLine = listing.getLine(newLoc);
+          if (newLine.second &&
+              newLine.first.address < currentLine.first.address) {
+            listAddress = newLine.first.address;
+            break;
           }
         }
       }
-      else {
-        listAddress = (listAddress+direction) & 0x0FFFF;
-      }
+    } else {
+      listAddress = (listAddress + direction) & 0x0FFFF;
     }
-    else {
-      if (direction>0) {
-        if (historyOffset > 0) historyOffset--;
-      }
-      else if (historyOffset+1 < historyCount) {
-        historyOffset++;
-      }
-      listAddress = history[ (historyIndex + HISTORY_SIZE - historyOffset-1) % HISTORY_SIZE ];
+  } else {
+    if (direction > 0) {
+      if (historyOffset > 0)
+        historyOffset--;
+    } else if (historyOffset + 1 < historyCount) {
+      historyOffset++;
     }
+    listAddress = history[(historyIndex + HISTORY_SIZE - historyOffset - 1) %
+                          HISTORY_SIZE];
+  }
 }
 
 void Beast::fileMenu(SDL_Event windowEvent) {
@@ -1229,7 +1271,8 @@ void Beast::run(bool run) {
       // Always use physical address based on current page mappings
       if ((pins & (Z80_RD | Z80_WR)) && debugManager->hasActiveWatchpoints()) {
         bool isRead = (pins & Z80_RD) != 0;
-        if (debugManager->checkWatchpoint(addr, physicalAddr, isRead, watchpointTriggerIndex)) {
+        if (debugManager->checkWatchpoint(addr, physicalAddr, isRead,
+                                          watchpointTriggerIndex)) {
           stopReason = STOP_WATCHPOINT;
           // Use tracked instruction start PC for accurate trigger address
           watchpointTriggerAddress = currentInstructionPC;
@@ -1426,16 +1469,21 @@ void Beast::run(bool run) {
       // trigger address)
       currentInstructionPC = cpu.pc - 1;
       history[historyIndex] = currentInstructionPC;
-      historyIndex = (historyIndex+1) % HISTORY_SIZE;
-      if (historyCount<HISTORY_SIZE) historyCount++;
+      historyIndex = (historyIndex + 1) % HISTORY_SIZE;
+      if (historyCount < HISTORY_SIZE)
+        historyCount++;
 
       // Check all breakpoints (user + system) via DebugManager
-      if (const Breakpoint* bp=debugManager->checkBreakpoint(cpu.pc - 1, memoryPage)) {
-        if (bp->isTrace ) {
+      if (const Breakpoint *bp =
+              debugManager->checkBreakpoint(cpu.pc - 1, memoryPage)) {
+        if (bp->isTrace) {
           int page = memoryPage[(currentInstructionPC >> 14) & 0x03];
-          uint32_t physicalAddr = (currentInstructionPC & 0x3FFF) | (page << 14);
+          uint32_t physicalAddr =
+              (currentInstructionPC & 0x3FFF) | (page << 14);
 
-          debugManager->logTrace(bp, cpu, physicalAddr, memoryPage, pagingEnabled, tickCount, [this](uint16_t address){ return this->readMem(address); });
+          debugManager->logTrace(
+              bp, cpu, physicalAddr, memoryPage, pagingEnabled, tickCount,
+              [this](uint16_t address) { return this->readMem(address); });
         } else {
           stopReason = STOP_BREAKPOINT;
           mode = GUI::DEBUG;
@@ -1588,7 +1636,8 @@ bool Beast::itemEdit(bool getLabel) {
     break;
 
   case SEL_PAGING:
-    if (!getLabel) pagingEnabled = !pagingEnabled;
+    if (!getLabel)
+      pagingEnabled = !pagingEnabled;
     break;
   case SEL_PAGE0:
     editValue(memoryPage[0], GUI::COL3, GUI::ROW2, 10, 2, getLabel);
@@ -1609,8 +1658,8 @@ bool Beast::itemEdit(bool getLabel) {
     if (memView[0] == MV_MEM)
       editValue(memPageAddress[0], GUI::COL1, GUI::ROW9, 3, 4, getLabel);
     if (memView[0] == MV_VIDEO)
-      editValue(getVideoAddress(0, memVideoView[0]), GUI::COL1, GUI::ROW9,
-                    3, 5, getLabel);
+      editValue(getVideoAddress(0, memVideoView[0]), GUI::COL1, GUI::ROW9, 3, 5,
+                getLabel);
     break;
   case SEL_VIEWADDR1:
     if (memView[1] == MV_Z80)
@@ -1618,8 +1667,8 @@ bool Beast::itemEdit(bool getLabel) {
     if (memView[1] == MV_MEM)
       editValue(memPageAddress[1], GUI::COL1, GUI::ROW13, 3, 4, getLabel);
     if (memView[1] == MV_VIDEO)
-      editValue(getVideoAddress(1, memVideoView[1]), GUI::COL1, GUI::ROW13,
-                    3, 5, getLabel);
+      editValue(getVideoAddress(1, memVideoView[1]), GUI::COL1, GUI::ROW13, 3,
+                5, getLabel);
     break;
   case SEL_VIEWADDR2:
     if (memView[2] == MV_Z80)
@@ -1627,8 +1676,8 @@ bool Beast::itemEdit(bool getLabel) {
     if (memView[2] == MV_MEM)
       editValue(memPageAddress[2], GUI::COL1, GUI::ROW17, 3, 4, getLabel);
     if (memView[2] == MV_VIDEO)
-      editValue(getVideoAddress(2, memVideoView[2]), GUI::COL1, GUI::ROW17,
-                    3, 5, getLabel);
+      editValue(getVideoAddress(2, memVideoView[2]), GUI::COL1, GUI::ROW17, 3,
+                5, getLabel);
     break;
 
   case SEL_VIEWPAGE0:
@@ -1642,7 +1691,8 @@ bool Beast::itemEdit(bool getLabel) {
     break;
 
   case SEL_VOLUME:
-    if (!getLabel) gui.startEdit(volume, 430, GUI::ROW19, 9, 2, false, GUI::ET_BASE_10);
+    if (!getLabel)
+      gui.startEdit(volume, 430, GUI::ROW19, 9, 2, false, GUI::ET_BASE_10);
     break;
 
   case SEL_A2:
@@ -1661,9 +1711,9 @@ bool Beast::itemEdit(bool getLabel) {
   case SEL_LISTING:
     if (listMode == LM_ADDRESS) {
       editValue(listAddress, GUI::COL1, GUI::END_ROW, 10, 4, getLabel);
-    }
-    else if (listMode == LM_HISTORY) {
-      gui.startEdit(historyOffset, GUI::COL1, GUI::END_ROW, 9, 4, false, GUI::ET_BASE_10);
+    } else if (listMode == LM_HISTORY) {
+      gui.startEdit(historyOffset, GUI::COL1, GUI::END_ROW, 9, 4, false,
+                    GUI::ET_BASE_10);
     }
     break;
   }
@@ -1671,11 +1721,11 @@ bool Beast::itemEdit(bool getLabel) {
   return gui.isEditing();
 }
 
-void Beast::editValue(uint32_t value, int x, int y, int characterOffset, int digits, bool getLabel) {
+void Beast::editValue(uint32_t value, int x, int y, int characterOffset,
+                      int digits, bool getLabel) {
   if (!getLabel) {
     gui.startEdit(value, x, y, characterOffset, digits);
-  }
-  else{
+  } else {
     gui.startPrompt(PROMPT_LABEL, "Start typing label to search");
     gui.promptLabel();
   }
@@ -1792,10 +1842,11 @@ void Beast::editComplete() {
       if (listMode == LM_HISTORY) {
         if (editValue < historyCount) {
           historyOffset = editValue;
-          listAddress = history[(historyIndex + HISTORY_SIZE - historyOffset-1) % HISTORY_SIZE];
+          listAddress =
+              history[(historyIndex + HISTORY_SIZE - historyOffset - 1) %
+                      HISTORY_SIZE];
         }
-      }
-      else {
+      } else {
         listAddress = editValue;
       }
       break;
@@ -1876,7 +1927,6 @@ void Beast::onFile() {
       row += GUI::ROW_HEIGHT;
     }
   }
-
 
   gui.print(GUI::COL1, GUI::END_ROW, menuColor, "[W]rite");
   gui.print(GUI::COL2, GUI::END_ROW, menuColor, "[R]un");
@@ -2041,7 +2091,8 @@ void Beast::onDebug() {
 
   if (listMode == LM_CPU) {
     gui.print(GUI::COL1, GUI::END_ROW, menuColor, "[L]ist");
-    gui.print(GUI::COL1 + gui.getWidthFor(7), GUI::END_ROW, historyCount>1 ?menuColor: disabledColor, "[H]istory");
+    gui.print(GUI::COL1 + gui.getWidthFor(7), GUI::END_ROW,
+              historyCount > 1 ? menuColor : disabledColor, "[H]istory");
     id--;
   } else if (listMode == LM_ADDRESS) {
     gui.print(GUI::COL1, GUI::END_ROW, menuColor, id-- ? 0 : -4, bright,
@@ -2366,7 +2417,8 @@ void Beast::drawListing(int page, uint16_t listAddress, SDL_Color textColor,
     lineCount = i + 1;
 
     if (listAddress == address) {
-      gui.print(GUI::COL1-gui.getWidthFor(1), GUI::ROW22 + (14 * i), (address == cpu.pc - 1) ? highColor : disassColor, ">");
+      gui.print(GUI::COL1 - gui.getWidthFor(1), GUI::ROW22 + (14 * i),
+                (address == cpu.pc - 1) ? highColor : disassColor, ">");
     }
 
     if (listLoc.valid) {
@@ -2481,8 +2533,8 @@ void Beast::drawListing(int page, uint16_t listAddress, SDL_Color textColor,
       bool hasBreakpoint = bpInfo.has_value();
 
       // Check for watchpoint trigger at this address
-      bool hasWatchpointTrigger =
-          (stopReason == STOP_WATCHPOINT && lineAddr == watchpointTriggerAddress);
+      bool hasWatchpointTrigger = (stopReason == STOP_WATCHPOINT &&
+                                   lineAddr == watchpointTriggerAddress);
 
       // If both BP and WP trigger on same line, offset them horizontally
       int bpCircleX = circleX;
@@ -2495,13 +2547,12 @@ void Beast::drawListing(int page, uint16_t listAddress, SDL_Color textColor,
       // Draw breakpoint indicator
       if (hasBreakpoint) {
         uint8_t alpha = bpInfo->enabled ? BP_ALPHA_ENABLED : BP_ALPHA_DISABLED;
-        if( bpInfo->isTrace ) {
+        if (bpInfo->isTrace) {
           filledCircleRGBA(sdlRenderer, bpCircleX, circleY, indicatorRadius,
-                         TRACE_COLOR_R, TRACE_COLOR_G, TRACE_COLOR_B, alpha);
-        }
-        else {
+                           TRACE_COLOR_R, TRACE_COLOR_G, TRACE_COLOR_B, alpha);
+        } else {
           filledCircleRGBA(sdlRenderer, bpCircleX, circleY, indicatorRadius,
-                         BP_COLOR_R, BP_COLOR_G, BP_COLOR_B, alpha);
+                           BP_COLOR_R, BP_COLOR_G, BP_COLOR_B, alpha);
         }
         // Draw the breakpoint number (1-8) centered in the circle
         char numStr[4];
@@ -2530,7 +2581,8 @@ void Beast::drawListing(int page, uint16_t listAddress, SDL_Color textColor,
 
         // Draw the watchpoint number (1-8) centered in the circle
         char numStr[4];
-        snprintf(numStr, sizeof(numStr), "%d", (unsigned int)(watchpointTriggerIndex + 1));
+        snprintf(numStr, sizeof(numStr), "%d",
+                 (unsigned int)(watchpointTriggerIndex + 1));
         SDL_Surface *textSurface =
             TTF_RenderText_Blended(indicatorFont, numStr, indicatorTextColor);
         if (textSurface) {
