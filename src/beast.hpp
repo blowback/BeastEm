@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include <set>
 #include <vector>
 #include "SDL.h"
@@ -206,9 +207,11 @@ class Beast {
 
         int16_t     audioBuffer[AUDIO_BUFFER_SIZE] = {0};
         int16_t     audioLastSample = 0;
-        int         audioRead = 0;
-        int         audioWrite= 0;
-        int         audioAvailable = 0;
+        // audioRead is written by the SDL audio thread, audioWrite by the
+        // emulator thread; audioAvailable is updated by both.
+        std::atomic<int> audioRead{0};
+        int              audioWrite = 0;
+        std::atomic<int> audioAvailable{0};
         uint64_t    audioSampleRatePs;
         int         volume;
         const char* audioFilename = "audio.raw";
