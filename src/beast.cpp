@@ -248,7 +248,7 @@ void Beast::setupAudio(int audioDevice, int sampleRate, int volume) {
     desiredSpec.freq = sampleRate;
     desiredSpec.format = AUDIO_S16SYS;
     desiredSpec.channels = 1;
-    desiredSpec.samples = AUDIO_BUFFER_SIZE / 4;
+    desiredSpec.samples = 1024;  // ~46 ms at 22050 Hz
     desiredSpec.callback = audio_callback;
     desiredSpec.userdata = this;
 
@@ -275,22 +275,34 @@ void Beast::setupAudio(int audioDevice, int sampleRate, int volume) {
 void Beast::loadSamples(Sint16 *stream, int length) {
   std::fill(stream, stream + length, audioLastSample);
 
-  if (audioAvailable < length)
+  int available = audioAvailable;
+  if (available < length)
     return;
+
+  int read = audioRead;
+
+  // If emulation has run ahead of playback (e.g. catching up after a pause),
+  // drop the oldest samples so latency stays at about two device buffers.
+  const int maxQueued = length * 2;
+  if (available > maxQueued) {
+    int drop = available - maxQueued;
+    read = (read + drop) % AUDIO_BUFFER_SIZE;
+    audioAvailable -= drop;
+  }
 
   int block1Length = length;
   int block2Length = 0;
-  if (audioRead + length > AUDIO_BUFFER_SIZE) {
-    block1Length = AUDIO_BUFFER_SIZE - audioRead;
+  if (read + length > AUDIO_BUFFER_SIZE) {
+    block1Length = AUDIO_BUFFER_SIZE - read;
     block2Length = length - block1Length;
   }
 
-  SDL_memcpy(stream, audioBuffer + audioRead, block1Length * 2);
+  SDL_memcpy(stream, audioBuffer + read, block1Length * 2);
   SDL_memcpy(stream + block1Length, audioBuffer, block2Length * 2);
 
-  audioLastSample = audioBuffer[((audioRead + length - 1) % AUDIO_BUFFER_SIZE)];
+  audioLastSample = audioBuffer[((read + length - 1) % AUDIO_BUFFER_SIZE)];
 
-  audioRead = (audioRead + length) % AUDIO_BUFFER_SIZE;
+  audioRead = (read + length) % AUDIO_BUFFER_SIZE;
   audioAvailable -= length;
   if (audioFile) {
     fwrite(stream, 2, length, audioFile);
